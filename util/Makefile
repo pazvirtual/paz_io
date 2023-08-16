@@ -1,3 +1,6 @@
+CXXVER := 17
+MINMACOSVER := 10.11
+
 ifeq ($(OS), Windows_NT)
     LIBPATH := /mingw64/lib
     OSPRETTY := Windows
@@ -11,20 +14,18 @@ else
     LIBPATH := /usr/local/lib
     BINPATH := /usr/local/bin
 endif
-CXXVER := 17
-OPTIM := 3
-CXXFLAGS := -std=c++$(CXXVER) -O$(OPTIM) -Wall -Wextra -Wno-missing-braces -Wold-style-cast
+CXXFLAGS := -std=c++$(CXXVER) -O3 -Wall -Wextra -Wno-missing-braces -Wold-style-cast
 ifeq ($(OSPRETTY), macOS)
-    CXXFLAGS += -mmacosx-version-min=10.11 -Wunguarded-availability -Wno-string-plus-int
+    CXXFLAGS += -mmacosx-version-min=$(MINMACOSVER) -Wunguarded-availability -Wno-string-plus-int
 else
     ifeq ($(OSPRETTY), Windows)
-        CXXFLAGS += -Wno-deprecated-copy
+        CXXFLAGS += -Wno-deprecated-copy -static
     endif
 endif
-INCL := -I..
-LIBS := ../libpazio.a
+CXXFLAGS += -I..
+LDLIBS := ../libpazio.a
 ifeq ($(OSPRETTY), macOS)
-    LIBS += -framework Cocoa
+    LDLIBS += -framework Cocoa
 endif
 
 SRC := $(wildcard *.cpp)
@@ -37,8 +38,12 @@ all: $(EXE)
 install: paz-archive
 	cmp -s paz-archive $(BINPATH)/paz-archive || cp paz-archive $(BINPATH)/
 
+ifeq ($(OSPRETTY), macOS)
 %: %.cpp
-	$(CXX) -o $@ $< $(CXXFLAGS) $(INCL) $(LIBS)
+	$(CXX) -arch arm64 -o $@_arm64 $< $(CXXFLAGS) $(INCL) $(LDLIBS)
+	$(CXX) -arch x86_64 -o $@_x86_64 $< $(CXXFLAGS) $(INCL) $(LDLIBS)
+	lipo -create -output $@ $@_arm64 $@_x86_64
+endif
 
 clean:
 	$(RM) $(EXE)

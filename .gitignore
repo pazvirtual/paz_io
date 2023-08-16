@@ -2,6 +2,8 @@
 *.a
 *.exe
 *.zip
-*.paz
+*.pazarchive
+*_arm64
+*_x86_64
 test/test
 util/paz-archive
