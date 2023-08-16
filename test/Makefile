@@ -32,7 +32,7 @@ endif
 SRC := $(wildcard *.cpp)
 EXE := $(SRC:.cpp=)
 
-print-% : ; @echo $* = $($*)
+.PHONY: $(SRC)
 
 all: $(EXE)
 
@@ -41,3 +41,5 @@ all: $(EXE)
 
 clean:
 	$(RM) $(EXE)
+
+print-% : ; @echo $* = $($*)
