@@ -1,6 +1,7 @@
 #include "PAZ_IO"
 #include <fstream>
 #include <sstream>
+#include <array>
 
 std::unordered_map<std::string, std::vector<float>> paz::load_obj(const std::
     string& path)
