@@ -120,7 +120,7 @@ namespace paz
     Bytes compress(const Bytes& src);
     Bytes uncompress(const Bytes& src);
 
-    Bytes load_bytes(const std::string& path);
+    Bytes read_bytes(const std::string& path);
     void write_bytes(const std::string& path, const Bytes& data);
 
     void remove(const std::string& path);

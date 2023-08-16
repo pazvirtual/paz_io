@@ -67,7 +67,7 @@ int main(int argc, char** argv)
     paz::Archive archive;
     for(const auto& n : files)
     {
-        archive.add(n, paz::load_bytes(isDir ? dirPath + "/" + n : n));
+        archive.add(n, paz::read_bytes(isDir ? dirPath + "/" + n : n));
     }
 
     // Create archive.

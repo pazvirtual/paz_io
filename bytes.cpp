@@ -26,7 +26,7 @@ std::string paz::Bytes::str() const
     return s;
 }
 
-paz::Bytes paz::load_bytes(const std::string& path)
+paz::Bytes paz::read_bytes(const std::string& path)
 {
     std::ifstream in(path, std::ios::binary);
     if(!in)

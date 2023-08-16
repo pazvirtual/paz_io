@@ -5,11 +5,65 @@
 
 paz::Image<std::uint8_t, 4> paz::parse_bmp(const Bytes& content)
 {
-    if(content[0] != 'B' || content[1] != 'M')
+    std::string fmt;
+    if(content.size() >= 15)
     {
-        throw std::runtime_error("Not a BMP.");
+        fmt = std::string(content.begin(), content.begin() + 2);
     }
-    throw std::logic_error("NOT IMPLEMENTED");
+    if(fmt != "BM" && fmt != "BA" && fmt != "CI" && fmt != "CP" && fmt != "IC"
+        && fmt != "PT")
+    {
+        throw std::runtime_error("Not a bitmap image.");
+    }
+    if(fmt != "BM")
+    {
+        throw std::runtime_error("Unsupported bitmap format " + fmt + ".");
+    }
+    std::size_t start = 0;
+    for(int i = 0; i < 4; ++i)
+    {
+        start |= content[10 + i] << 8*i;
+    }
+    std::size_t headerSize = 0;
+    for(int i = 0; i < 4; ++i)
+    {
+        headerSize |= content[14 + i] << 8*i;
+    }
+    if(headerSize != 40)
+    {
+        throw std::runtime_error("Unsupported DIB header format (must be BITMAP"
+            "INFOHEADER).");
+    }
+    long width = 0;
+    for(int i = 0; i < 4; ++i)
+    {
+        width |= content[18 + i] << 8*i;
+    }
+    long height = 0;
+    for(int i = 0; i < 4; ++i)
+    {
+        height |= content[22 + i] << 8*i;
+    }
+    //TEMP - need to check compression method, color depth, and palette
+    Image<std::uint8_t, 4> res(width, height);
+    unsigned int extraBytes = 4 - ((3*width)%4);
+    if(extraBytes == 4)
+    {
+        extraBytes = 0;
+    }
+    for(int i = 0; i < height; ++i)
+    {
+        for(int j = 0; j < width; ++j)
+        {
+            for(int k = 0; k < 3; ++k)
+            {
+                res[4*(width*i + j) + k] = content[3*((extraBytes + width)*i +
+                    j) + 2 - k];
+            }
+            res[4*(width*i + j) + 3] = 255;
+        }
+    }
+    return res;
 }
 
 paz::Bytes paz::to_bmp(const Image<std::uint8_t, 4>& img)
@@ -20,9 +74,9 @@ paz::Bytes paz::to_bmp(const Image<std::uint8_t, 4>& img)
         extraBytes = 0;
     }
 
-    const unsigned int paddedSize = (3*img.width() + extraBytes)*img.height();
-    const std::array<unsigned int, 13> headers = {paddedSize + 54u, 0, 54, 40,
-        static_cast<unsigned int>(img.width()), static_cast<unsigned int>(img.
+    const unsigned long paddedSize = (3*img.width() + extraBytes)*img.height();
+    const std::array<unsigned long, 13> headers = {paddedSize + 54u, 0, 54, 40,
+        static_cast<unsigned long>(img.width()), static_cast<unsigned long>(img.
         height()), 0, 0, paddedSize, 0, 0, 0, 0};
 
     Bytes res("BM");
