@@ -35,6 +35,8 @@ namespace paz
     std::unordered_map<std::string, std::size_t> load_contents_list(const std::
         string& path);
     std::string load_block(const std::string& path, const std::string& name);
+
+    std::string load_text(const std::string& path);
 }
 
 #endif

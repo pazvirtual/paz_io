@@ -48,6 +48,7 @@ print-% : ; @echo $* = $($*)
 
 default: lib$(LIBNAME).a
 	make -C test
+	make -C util
 
 lib$(LIBNAME).a: $(OBJ)
 	$(RM) lib$(LIBNAME).a
@@ -57,9 +58,11 @@ ifneq ($(REINSTALLHEADER), 0)
 install: $(PROJNAME) lib$(LIBNAME).a
 	cp $(PROJNAME) $(INCLPATH)/
 	cp lib$(LIBNAME).a $(LIBPATH)/
+	make -C util install
 else
 install: $(PROJNAME) lib$(LIBNAME).a
 	cp lib$(LIBNAME).a $(LIBPATH)/
+	make -C util install
 endif
 
 analyze: $(OBJCSRC)
@@ -77,6 +80,7 @@ analyze: $(OBJCSRC)
 clean:
 	$(RM) $(OBJ) lib$(LIBNAME).a
 	make -C test clean
+	make -C util clean
 
 zip: $(PROJNAME) lib$(LIBNAME).a
 	zip -j $(ZIPNAME).zip $(PROJNAME) lib$(LIBNAME).a

@@ -1,6 +1,7 @@
 ifeq ($(OS), Windows_NT)
     LIBPATH := /mingw64/lib
     OSPRETTY := Windows
+    BINPATH := /mingw64/bin
 else
     ifeq ($(shell uname -s), Darwin)
         LIBPATH := /usr/local/lib
@@ -9,6 +10,7 @@ else
         LIBPATH := /usr/local/lib64
         OSPRETTY := Linux
     endif
+    BINPATH := /usr/local/bin
 endif
 CXXVER := 14
 OPTIM := fast
@@ -33,6 +35,9 @@ EXE := $(SRC:.cpp=)
 print-% : ; @echo $* = $($*)
 
 all: $(EXE)
+
+install: paz-archive
+	cp paz-archive $(BINPATH)/
 
 %: %.cpp
 	$(CXX) -o $@ $< $(CXXFLAGS) $(INCL) $(LIBS)
