@@ -11,8 +11,17 @@ namespace paz
     std::array<std::string, 3> split_path(const std::string& path);
     void write_bmp(const std::string& path, unsigned int width, const std::
         vector<float>& rgb);
-    std::unordered_map<std::string, std::vector<float>> load_obj(const std::
-        string& path);
+    void load_obj(const std::string& path, std::vector<std::string>& names,
+        std::vector<std::vector<float>>& positions, std::vector<std::vector<
+        float>>& uvs, std::vector<std::vector<float>>& normals, std::vector<
+        std::vector<unsigned int>> materials, std::vector<std::string>&
+        materialNames, std::vector<std::string>& materialLibs);
+    void load_obj(const std::string& path, std::vector<std::string>& names,
+        std::vector<std::vector<float>>& positions, std::vector<std::vector<
+        float>>& uvs, std::vector<std::vector<float>>& normals, std::vector<
+        std::vector<unsigned int>> materials, std::vector<std::string>&
+        materialNames, std::vector<std::string>& materialLibs, std::vector<std::
+        vector<unsigned int>>& indices);
 }
 
 #endif
