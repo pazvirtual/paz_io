@@ -64,7 +64,7 @@ int main(int argc, char** argv)
     }
 
     // Compress input files.
-    std::unordered_map<std::string, std::vector<unsigned char>> blocks;
+    std::unordered_map<std::string, paz::Bytes> blocks;
     for(const auto& n : files)
     {
         blocks[n] = paz::compress(paz::load_text(isDir ? dirPath + "/" + n :

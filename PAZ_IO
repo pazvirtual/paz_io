@@ -8,6 +8,16 @@
 
 namespace paz
 {
+    class Bytes : public std::vector<unsigned char>
+    {
+        using std::vector<unsigned char>::vector;
+
+    public:
+        Bytes(const char* str);
+        Bytes(const std::string& str);
+        std::string str() const;
+    };
+
     std::array<std::string, 3> split_path(const std::string& path);
 
     void write_bmp(const std::string& path, unsigned int width, const std::
@@ -28,10 +38,10 @@ namespace paz
         materialNames, std::vector<std::string>& materialLibs, std::vector<std::
         vector<unsigned int>>& indices);
 
-    std::vector<unsigned char> compress(const std::string& str);
-    std::string uncompress(const std::vector<unsigned char>& src);
+    Bytes compress(const Bytes& src);
+    Bytes uncompress(const Bytes& src);
     void write_archive(const std::string& path, const std::unordered_map<std::
-        string, std::vector<unsigned char>>& blocks);
+        string, Bytes>& blocks);
     std::unordered_map<std::string, std::size_t> load_contents_list(const std::
         string& path);
     std::string load_block(const std::string& path, const std::string& name);

@@ -35,7 +35,7 @@ int main(int, char** argv)
     std::string res;
     try
     {
-        if(paz::uncompress(paz::compress(TestString)) != TestString)
+        if(paz::uncompress(paz::compress(TestString)).str() != TestString)
         {
             throw std::runtime_error("Strings do not match.");
         }
@@ -45,7 +45,7 @@ int main(int, char** argv)
     // Test 3: Writing an archive.
     try
     {
-        std::unordered_map<std::string, std::vector<unsigned char>> data;
+        std::unordered_map<std::string, paz::Bytes> data;
         for(const auto& n : TestData)
         {
             data[n.first] = paz::compress(n.second);

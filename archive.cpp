@@ -37,31 +37,30 @@ std::string mz_status(int status)
     return "Status code " + std::to_string(status) + " not recognized";
 }
 
-std::vector<unsigned char> paz::compress(const std::string& str)
+paz::Bytes paz::compress(const Bytes& src)
 {
     // Check if this is too much data for Miniz to handle in one shot.
-    const std::size_t cmpLenTemp = compress_bound(str.length());
+    const std::size_t cmpLenTemp = compress_bound(src.size());
     if(cmpLenTemp > std::numeric_limits<unsigned long>::max())
     {
-        throw std::invalid_argument("String exceeds maximum length for compress"
+        throw std::invalid_argument("Buffer exceeds maximum length for compress"
             "ion (" + std::to_string(cmpLenTemp) + "/" + std::to_string(std::
             numeric_limits<unsigned long>::max()) + ")");
     }
 
     // Compress output. (First four bytes are used to store uncompressed size).
-    const char* outStr = str.c_str();
-    const unsigned long srcLen = str.length();
+    const unsigned long srcLen = src.size();
     unsigned long cmpLen = cmpLenTemp;
 
-    std::vector<unsigned char> buf(cmpLen + 4);
+    Bytes buf(cmpLen + 4);
 
     for(unsigned long i = 0; i < 4; ++i)
     {
         buf[i] = (unsigned char)(srcLen >> 8*i);
     }
 
-    const int status = mz_compress2(buf.data() + 4, &cmpLen, (const unsigned
-        char*)outStr, srcLen, MZ_BEST_COMPRESSION);
+    const int status = mz_compress2(buf.data() + 4, &cmpLen, src.data(), srcLen,
+        MZ_BEST_COMPRESSION);
     if(status != MZ_OK)
     {
         throw std::runtime_error("Compression failed: " + mz_status(status) +
@@ -73,7 +72,7 @@ std::vector<unsigned char> paz::compress(const std::string& str)
     return buf;
 }
 
-std::string paz::uncompress(const std::vector<unsigned char>& src)
+paz::Bytes paz::uncompress(const Bytes& src)
 {
     // Extract size of uncompressed data.
     const unsigned long srcLen = src.size();
@@ -89,7 +88,7 @@ std::string paz::uncompress(const std::vector<unsigned char>& src)
     }
 
     // Decompress input.
-    std::vector<unsigned char> buf(destLen);
+    Bytes buf(destLen);
     const int status = mz_uncompress(buf.data(), &destLen, src.data() + 4,
         srcLen - 4);
     if(status != MZ_OK)
@@ -98,11 +97,11 @@ std::string paz::uncompress(const std::vector<unsigned char>& src)
             ".");
     }
 
-    return std::string(buf.begin(), buf.end());
+    return buf;
 }
 
 void paz::write_archive(const std::string& path, const std::unordered_map<std::
-    string, std::vector<unsigned char>>& blocks)
+    string, Bytes>& blocks)
 {
     // Construct contents list.
     std::ostringstream contents;
@@ -126,7 +125,7 @@ void paz::write_archive(const std::string& path, const std::unordered_map<std::
     }
 
     // Compress and write contents list to file.
-    const std::vector<unsigned char> buf = paz::compress(contents.str());
+    const Bytes buf = paz::compress(contents.str());
     const unsigned long dataStart = buf.size();
     for(unsigned long i = 0; i < 4; ++i)
     {
@@ -153,10 +152,10 @@ std::unordered_map<std::string, std::size_t> paz::load_contents_list(const std::
     }
 
     // Extract input data and close file.
-    std::vector<unsigned char> src((std::istreambuf_iterator<char>(file)), std::
+    const Bytes src((std::istreambuf_iterator<char>(file)), std::
         istreambuf_iterator<char>());
     file.close();
-    if(!src.size())
+    if(src.empty())
     {
         throw std::runtime_error("Archive \"" + std::string(path) + "\" is empt"
             "y.");
@@ -168,8 +167,8 @@ std::unordered_map<std::string, std::size_t> paz::load_contents_list(const std::
     {
         dataStart |= (unsigned long)src[i] << 8*i;
     }
-    std::stringstream ss(paz::uncompress(std::vector<unsigned char>(src.begin()
-        + 4, src.begin() + 4 + dataStart)));
+    std::stringstream ss(paz::uncompress(Bytes(src.begin() + 4, src.begin() + 4
+        + dataStart)).str());
     std::unordered_map<std::string, std::size_t> contents;
     std::string line;
     while(std::getline(ss, line))
@@ -196,10 +195,10 @@ std::string paz::load_block(const std::string& path, const std::string& name)
     }
 
     // Extract input data and close file.
-    std::vector<unsigned char> src((std::istreambuf_iterator<char>(file)), std::
+    const Bytes src((std::istreambuf_iterator<char>(file)), std::
         istreambuf_iterator<char>());
     file.close();
-    if(!src.size())
+    if(src.empty())
     {
         throw std::runtime_error("Archive \"" + path + "\" is empty.");
     }
@@ -210,8 +209,8 @@ std::string paz::load_block(const std::string& path, const std::string& name)
     {
         dataStart |= (unsigned long)src[i] << 8*i;
     }
-    std::stringstream ss(paz::uncompress(std::vector<unsigned char>(src.begin()
-        + 4, src.begin() + 4 + dataStart)));
+    std::stringstream ss(paz::uncompress(Bytes(src.begin() + 4, src.begin() + 4
+        + dataStart)).str());
     std::string line;
     std::size_t start = 0;
     std::size_t end = src.size();
@@ -239,6 +238,5 @@ std::string paz::load_block(const std::string& path, const std::string& name)
             "ck \"" + name + "\".");
     }
 
-    return uncompress(std::vector<unsigned char>(src.begin() + start, src.
-        begin() + end));
+    return uncompress(Bytes(src.begin() + start, src.begin() + end)).str();
 }
