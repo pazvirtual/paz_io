@@ -63,9 +63,8 @@ namespace paz
             }
         }
         template<typename U, require_iterable<U>* = nullptr>
-        Image(const U& data, int width, int height) : std::vector<T>(&*std::
-            begin(data), std::distance(&*std::begin(data), &*std::end(data))),
-            _rows(height)
+        Image(const U& data, int width, int height) : std::vector<T>(std::begin(
+            data), std::end(data)), _rows(height)
         {
             if(data.size() != width*height*NumChannels)
             {
