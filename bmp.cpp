@@ -3,7 +3,7 @@
 #include <fstream>
 #include <cmath>
 
-paz::Image<std::uint8_t, 3> paz::parse_bmp(const Bytes& content)
+paz::Image<std::uint8_t, 4> paz::parse_bmp(const Bytes& content)
 {
     if(content[0] != 'B' || content[1] != 'M')
     {
@@ -12,7 +12,7 @@ paz::Image<std::uint8_t, 3> paz::parse_bmp(const Bytes& content)
     throw std::logic_error("NOT IMPLEMENTED");
 }
 
-void paz::write_bmp(const std::string& path, const Image<std::uint8_t, 3>& img)
+void paz::write_bmp(const std::string& path, const Image<std::uint8_t, 4>& img)
 {
     unsigned int extraBytes = 4 - ((3*img.width())%4);
     if(extraBytes == 4)
@@ -60,7 +60,7 @@ void paz::write_bmp(const std::string& path, const Image<std::uint8_t, 3>& img)
         {
             for(int i = 2; i >= 0; --i)
             {
-                out.put(img[3*(y*img.width() + x) + i]);
+                out.put(img[4*(y*img.width() + x) + i]);
             }
         }
         for(unsigned int i = 0; i < extraBytes; ++i)

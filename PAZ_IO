@@ -99,8 +99,8 @@ namespace paz
     Image<std::uint8_t, 1> parse_pbm(const Bytes& content);
     void write_pbm(const std::string& path, const Image<std::uint8_t, 1>& img);
 
-    Image<std::uint8_t, 3> parse_bmp(const Bytes& content);
-    void write_bmp(const std::string& path, const Image<std::uint8_t, 3>& img);
+    Image<std::uint8_t, 4> parse_bmp(const Bytes& content);
+    void write_bmp(const std::string& path, const Image<std::uint8_t, 4>& img);
 
     // Positions and normals are padded for graphics compatibility ([vx, vy, vz,
     // 1] and [nx, ny, nz, 0]) and materials are one-indexed (0: unassigned, 1:
