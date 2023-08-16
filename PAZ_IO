@@ -1,0 +1,13 @@
+#ifndef PAZ_IO
+#define PAZ_IO
+
+#include <iostream>
+#include <vector>
+
+namespace paz
+{
+    void write_bmp(const std::string& path, unsigned int width, const std::
+        vector<float>& rgb);
+}
+
+#endif
