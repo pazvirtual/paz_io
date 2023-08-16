@@ -15,10 +15,9 @@ std::array<std::string, 3> paz::split_path(const std::string& path)
     {
         @try
         {
-            NSURL* p = [NSURL URLWithString:[NSString stringWithUTF8String:path.
-                c_str()]];
+            NSString* p = [NSString stringWithUTF8String:path.c_str()];
             NSString* f = [p lastPathComponent];
-            const std::string dir = [[[p URLByDeletingLastPathComponent] path]
+            const std::string dir = [[p stringByDeletingLastPathComponent]
                 UTF8String];
             const std::string name = [[f stringByDeletingPathExtension]
                 UTF8String];
