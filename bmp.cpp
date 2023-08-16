@@ -3,6 +3,15 @@
 #include <fstream>
 #include <cmath>
 
+paz::Image<std::uint8_t, 3> paz::parse_bmp(const Bytes& content)
+{
+    if(content[0] != 'B' || content[1] != 'M')
+    {
+        throw std::runtime_error("Not a BMP.");
+    }
+    throw std::logic_error("NOT IMPLEMENTED");
+}
+
 void paz::write_bmp(const std::string& path, const Image<std::uint8_t, 3>& img)
 {
     unsigned int extraBytes = 4 - ((3*img.width())%4);

@@ -17,6 +17,8 @@ static const std::unordered_map<std::string, paz::Bytes> TestData =
     {"file1.ext", "content content\ncontent content"},
     {"file2.whatever", "other stuff"}
 };
+static const std::string PbmPath = "test-image.pbm";
+static constexpr int ImgRes = 10;
 
 int main(int, char** argv)
 {
@@ -93,6 +95,25 @@ int main(int, char** argv)
         {
            throw std::runtime_error("Line ending conversion failed.");
         }
+    }
+    CATCH
+
+    // Write, read, and delete a binary PBM file.
+    try
+    {
+        paz::Image<std::uint8_t, 1> a(ImgRes, ImgRes);
+        for(int i = 0; i < ImgRes; ++i)
+        {
+            a[ImgRes*i + i] = 255;
+        }
+        paz::write_pbm(appDir + "/" + PbmPath, a);
+        const paz::Image<std::uint8_t, 1> b = paz::parse_pbm(paz::load_file(
+            appDir + "/" + PbmPath));
+        if(a != b)
+        {
+            throw std::runtime_error("Images do not match.");
+        }
+        paz::remove(appDir + "/" + PbmPath);
     }
     CATCH
 }
