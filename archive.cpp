@@ -213,3 +213,14 @@ void paz::Archive::clear()
 {
     _blocks.clear();
 }
+
+std::unordered_set<std::string> paz::Archive::contents() const
+{
+    std::unordered_set<std::string> contentsList;
+    contentsList.reserve(_blocks.size());
+    for(auto& n : _blocks)
+    {
+        contentsList.insert(n.first);
+    }
+    return contentsList;
+}

@@ -56,6 +56,18 @@ int main(int, char** argv)
     try
     {
         const paz::Archive archive(appDir + "/" + ArchivePath);
+        const auto contents = archive.contents();
+        if(archive.contents().size() != TestData.size())
+        {
+            throw std::runtime_error("Incorrect number of contents.");
+        }
+        for(const auto& n : contents)
+        {
+            if(!TestData.count(n))
+            {
+                throw std::runtime_error("Unrecognized name in contents list.");
+            }
+        }
         for(const auto& n : TestData)
         {
             if(archive.get(n.first) != n.second)

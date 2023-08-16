@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <array>
 #include <cstdint>
 
@@ -37,6 +38,7 @@ namespace paz
         void load(const std::string& path);
         void write(const std::string& path) const;
         void clear();
+        std::unordered_set<std::string> contents() const;
     };
 
 #ifndef PAZ_GRAPHICS
