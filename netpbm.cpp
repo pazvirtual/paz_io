@@ -1,6 +1,27 @@
 #include "PAZ_IO"
 #include <sstream>
 
+static void skip_space(const paz::Bytes& content, std::size_t& idx)
+{
+    while(idx < content.size() && std::isspace(content[idx]))
+    {
+        ++idx;
+    }
+}
+
+static unsigned int get_dim(const paz::Bytes& content, std::size_t& idx)
+{
+    std::stringstream ss;
+    while(idx < content.size() && !std::isspace(content[idx]))
+    {
+        ss << content[idx];
+        ++idx;
+    }
+    unsigned int dim;
+    ss >> dim;
+    return dim;
+}
+
 // Need to add support for comments.
 paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
 {
@@ -11,13 +32,13 @@ paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
     }
     const bool isBinary = content[1] == '4';
 
-    // Create input stream.
-    std::istringstream iss(content.str().substr(2));
-
     // Get dimensions.
-    unsigned int width, height;
-    iss >> width;
-    iss >> height;
+    std::size_t idx = 2;
+    skip_space(content, idx);
+    const unsigned int width = get_dim(content, idx);
+    skip_space(content, idx);
+    const unsigned int height = get_dim(content, idx);
+    skip_space(content, idx);
 
     // Get data.
     Image<std::uint8_t, 1> image(width, height);
@@ -25,9 +46,9 @@ paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
     unsigned int n = 0;
     if(isBinary)
     {
-        std::uint8_t b;
-        while(iss >> b && n < width*height)
+        while(idx < content.size() && n < width*height)
         {
+            const std::uint8_t b = content[idx++];
             for(int i = 0; i < 8; ++i)
             {
                 const unsigned int x = n%width;
@@ -43,9 +64,9 @@ paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
     }
     else
     {
-        char c;
-        while(iss >> c && n < width*height)
+        while(idx < content.size() && n < width*height)
         {
+            const char c = content[idx++];
             if(c == '0')
             {
                 const unsigned int x = n%width;
@@ -62,7 +83,8 @@ paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
     // Check that we got all the pixels.
     if(n != width*height)
     {
-        throw std::runtime_error("Number of pixels does not match dimensions.");
+        throw std::runtime_error("Got " + std::to_string(n) + " pixels, expecte"
+            "d at least " + std::to_string(width*height) + ".");
     }
 
     return image;
