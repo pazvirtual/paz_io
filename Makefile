@@ -16,6 +16,11 @@ endif
 CXXVER := 17
 OPTIM := fast
 ZIPNAME := $(PROJNAME)-$(OSPRETTY)
+ifeq ($(OSPRETTY), Windows)
+    ZIPCONTENTS := $(PROJNAME) lib$(LIBNAME).a util/paz-archive.exe
+else
+    ZIPCONTENTS := $(PROJNAME) lib$(LIBNAME).a util/paz-archive
+endif
 CFLAGS := -O$(OPTIM) -Wall -Wextra -Wno-missing-braces
 ifeq ($(OSPRETTY), macOS)
     CFLAGS += -mmacosx-version-min=10.10
@@ -82,5 +87,5 @@ clean:
 	make -C test clean
 	make -C util clean
 
-zip: $(PROJNAME) lib$(LIBNAME).a
-	zip -j $(ZIPNAME).zip $(PROJNAME) lib$(LIBNAME).a
+zip: $(ZIPCONTENTS)
+	zip -j $(ZIPNAME).zip $(ZIPCONTENTS)
