@@ -2,11 +2,35 @@
 #include <sstream>
 #include <fstream>
 
-static void skip_space(const paz::Bytes& content, std::size_t& idx)
+static void skip(const paz::Bytes& content, std::size_t& idx)
 {
-    while(idx < content.size() && std::isspace(content[idx]))
+    bool inComment = false;
+    while(idx < content.size())
     {
-        ++idx;
+        if(inComment)
+        {
+            if(content[idx] == '\n')
+            {
+                inComment = false;
+            }
+            ++idx;
+        }
+        else
+        {
+            if(std::isspace(content[idx]))
+            {
+                ++idx;
+            }
+            else if(content[idx] == '#')
+            {
+                inComment = true;
+                ++idx;
+            }
+            else
+            {
+                return;
+            }
+        }
     }
 }
 
@@ -66,11 +90,11 @@ paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
 
     // Get dimensions.
     std::size_t idx = 2;
-    skip_space(content, idx);
+    skip(content, idx);
     const unsigned int width = get_dim(content, idx);
-    skip_space(content, idx);
+    skip(content, idx);
     const unsigned int height = get_dim(content, idx);
-    skip_space(content, idx);
+    skip(content, idx);
 
     // Get data.
     Image<std::uint8_t, 1> image(width, height);
