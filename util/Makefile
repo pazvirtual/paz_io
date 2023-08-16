@@ -4,12 +4,11 @@ ifeq ($(OS), Windows_NT)
     BINPATH := /mingw64/bin
 else
     ifeq ($(shell uname -s), Darwin)
-        LIBPATH := /usr/local/lib
         OSPRETTY := macOS
     else
-        LIBPATH := /usr/local/lib64
         OSPRETTY := Linux
     endif
+    LIBPATH := /usr/local/lib
     BINPATH := /usr/local/bin
 endif
 CXXVER := 14
