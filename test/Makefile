@@ -26,7 +26,7 @@ LIBS := ../libpazio.a
 ifeq ($(OSPRETTY), macOS)
     LIBS += -framework Cocoa
 else
-    LIBS += $(LIBPATH)/libglfw3.a -lstdc++fs
+    LIBS += -lstdc++fs
 endif
 
 SRC := $(wildcard *.cpp)
