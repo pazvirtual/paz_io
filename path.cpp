@@ -13,7 +13,7 @@ std::array<std::string, 3> paz::split_path(const std::string& path)
     }
     try
     {
-        const auto p = std::filesystem::path(path);
+        const std::filesystem::path p(path);
         const auto f = p.filename();
         return {p.parent_path().string(), f.stem().string(), f.extension().
             string()};
