@@ -15,7 +15,7 @@ CXXVER := 14
 OPTIM := fast
 CXXFLAGS := -std=c++$(CXXVER) -O$(OPTIM) -Wall -Wextra -Wno-missing-braces -Wold-style-cast
 ifeq ($(OSPRETTY), macOS)
-    CXXFLAGS += -mmacosx-version-min=10.10
+    CXXFLAGS += -mmacosx-version-min=10.11 -Wunguarded-availability
 else
     ifeq ($(OSPRETTY), Windows)
         CXXFLAGS += -Wno-deprecated-copy
