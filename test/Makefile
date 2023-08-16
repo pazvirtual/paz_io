@@ -23,8 +23,6 @@ CXXFLAGS += -I..
 LDLIBS := ../libpazio.a
 ifeq ($(OSPRETTY), macOS)
     LDLIBS += -framework Cocoa
-else
-    LDLIBS += -lstdc++fs
 endif
 
 SRC := $(wildcard *.cpp)
