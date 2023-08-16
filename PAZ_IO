@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <array>
+#include <cstdint>
 
 namespace paz
 {
@@ -38,28 +39,23 @@ namespace paz
         void clear();
     };
 
-    template<typename T, unsigned int NumChannels>
+    template<typename T, int NumChannels>
     class Image
     {
         std::vector<T> _pixels;
-        unsigned int _rows;
+        int _rows;
+
+        Image() {}
 
     public:
-        Image() {}
-        Image(const T* data, unsigned int width, unsigned int height) : _pixels(
-            data, data + width*height*NumChannels), _rows(height) {}
+        Image(int width, int height) : _pixels(width*height*NumChannels), _rows(
+            height) {}
+        Image(const T* data, int width, int height) : _pixels(data, data +
+            width*height*NumChannels), _rows(height) {}
 
-        template<typename U>
-        void fill(const U& data, unsigned int width, unsigned int height)
+        T* data()
         {
-            _pixels = std::vector<T>(data.begin(), data.end());
-            _rows = height;
-        }
-        template<typename U>
-        void fill(const U* data, unsigned int width, unsigned int height)
-        {
-            _pixels = std::vector<T>(data, data + width*height*NumChannels);
-            _rows = height;
+            return _pixels.data();
         }
 
         const T* data() const
@@ -67,12 +63,12 @@ namespace paz
             return _pixels.data();
         }
 
-        unsigned int width() const
+        int width() const
         {
             return _pixels.size()/NumChannels/_rows;
         }
 
-        unsigned int height() const
+        int height() const
         {
             return _rows;
         }
@@ -87,6 +83,11 @@ namespace paz
             return _pixels.end();
         }
 
+        const T& operator[](std::size_t i) const
+        {
+            return _pixels[i];
+        }
+
         template<typename U, require_same<T, U>* = nullptr>
         const auto& cast() const
         {
@@ -96,17 +97,17 @@ namespace paz
         auto cast() const
         {
             Image<U, NumChannels> image;
-            image.fill(_pixels, width(), height());
+            image._pixels = std::vector<U>(_pixels.begin(), _pixels.end());
+            image._rows = _rows;
             return image;
         }
     };
 
     std::array<std::string, 3> split_path(const std::string& path);
 
-    Image<unsigned int, 1> load_pbm(const std::string& path);
+    Image<std::uint8_t, 1> load_pbm(const std::string& path);
 
-    void write_bmp(const std::string& path, unsigned int width, const std::
-        vector<float>& rgb);
+    void write_bmp(const std::string& path, const Image<float, 3>& image);
 
     // Positions and normals are padded for graphics compatibility ([vx, vy, vz,
     // 1] and [nx, ny, nz, 0]) and materials are one-indexed (0: unassigned, 1:

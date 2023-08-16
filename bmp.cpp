@@ -3,21 +3,19 @@
 #include <fstream>
 #include <cmath>
 
-void paz::write_bmp(const std::string& path, unsigned int width, const std::
-    vector<float>& rgb)
+void paz::write_bmp(const std::string& path, const Image<float, 3>& image)
 {
-    unsigned int extraBytes = 4 - ((3*width)%4);
+    unsigned int extraBytes = 4 - ((3*image.width())%4);
     if(extraBytes == 4)
     {
         extraBytes = 0;
     }
 
-    const unsigned int height = rgb.size()/(3*width);
-    const unsigned int paddedSize = (3*width + extraBytes)*height;
-    const std::array<unsigned int, 13> headers =
-    {
-        paddedSize + 54, 0, 54, 40, width, height, 0, 0, paddedSize, 0, 0, 0, 0
-    };
+    const unsigned int paddedSize = (3*image.width() + extraBytes)*image.
+        height();
+    const std::array<unsigned int, 13> headers = {paddedSize + 54u, 0, 54, 40,
+        (unsigned int)image.width(), (unsigned int)image.height(), 0, 0,
+        paddedSize, 0, 0, 0, 0};
 
     std::ofstream out(path, std::ios::binary);
     if(!out)
@@ -48,14 +46,14 @@ void paz::write_bmp(const std::string& path, unsigned int width, const std::
         out.put((headers[i]&(unsigned int)0xff000000) >> 24);
     }
 
-    for(unsigned int y = 0; y < height; ++y)
+    for(int y = 0; y < image.height(); ++y)
     {
-        for(unsigned int x = 0; x < width; ++x)
+        for(int x = 0; x < image.width(); ++x)
         {
             for(int i = 2; i >= 0; --i)
             {
-                out.put(std::min((unsigned int)std::round(std::max(rgb[3*(y*
-                    width + x) + i], 0.f)*255.f), 255u));
+                out.put(std::min((unsigned int)std::round(std::max(image[3*(y*
+                    image.width() + x) + i], 0.f)*255.f), 255u));
             }
         }
         for(unsigned int i = 0; i < extraBytes; ++i)
