@@ -14,8 +14,8 @@ void paz::write_bmp(const std::string& path, const Image<float, 3>& image)
     const unsigned int paddedSize = (3*image.width() + extraBytes)*image.
         height();
     const std::array<unsigned int, 13> headers = {paddedSize + 54u, 0, 54, 40,
-        (unsigned int)image.width(), (unsigned int)image.height(), 0, 0,
-        paddedSize, 0, 0, 0, 0};
+        static_cast<unsigned int>(image.width()), static_cast<unsigned int>(
+        image.height()), 0, 0, paddedSize, 0, 0, 0, 0};
 
     std::ofstream out(path, std::ios::binary);
     if(!out)
@@ -27,10 +27,10 @@ void paz::write_bmp(const std::string& path, const Image<float, 3>& image)
 
     for(int i = 0; i < 6; ++i)
     {
-        out.put(headers[i]&0x000000ff);
-        out.put((headers[i]&0x0000ff00) >> 8);
-        out.put((headers[i]&0x00ff0000) >> 16);
-        out.put((headers[i]&(unsigned int)0xff000000) >> 24);
+        out.put(headers[i]&0x000000ffu);
+        out.put((headers[i]&0x0000ff00u) >> 8);
+        out.put((headers[i]&0x00ff0000u) >> 16);
+        out.put((headers[i]&0xff000000u) >> 24);
     }
 
     out.put(1);
@@ -40,10 +40,10 @@ void paz::write_bmp(const std::string& path, const Image<float, 3>& image)
 
     for(int i = 7; i < 13; ++i)
     {
-        out.put(headers[i]&0x000000ff);
-        out.put((headers[i]&0x0000ff00) >> 8);
-        out.put((headers[i]&0x00ff0000) >> 16);
-        out.put((headers[i]&(unsigned int)0xff000000) >> 24);
+        out.put(headers[i]&0x000000ffu);
+        out.put((headers[i]&0x0000ff00u) >> 8);
+        out.put((headers[i]&0x00ff0000u) >> 16);
+        out.put((headers[i]&0xff000000u) >> 24);
     }
 
     for(int y = 0; y < image.height(); ++y)
@@ -52,8 +52,8 @@ void paz::write_bmp(const std::string& path, const Image<float, 3>& image)
         {
             for(int i = 2; i >= 0; --i)
             {
-                out.put(std::min((unsigned int)std::round(std::max(image[3*(y*
-                    image.width() + x) + i], 0.f)*255.f), 255u));
+                out.put(std::min(static_cast<unsigned int>(std::round(std::max(
+                    image[3*(y*image.width() + x) + i], 0.f)*255.f)), 255u));
             }
         }
         for(unsigned int i = 0; i < extraBytes; ++i)

@@ -57,7 +57,7 @@ paz::Bytes paz::compress(const Bytes& src)
 
     for(unsigned long i = 0; i < 4; ++i)
     {
-        buf[i] = (unsigned char)(srcLen >> 8*i);
+        buf[i] = static_cast<unsigned char>(srcLen >> 8*i);
     }
 
     const int status = mz_compress2(buf.data() + 4, &cmpLen, src.data(), srcLen,
@@ -80,7 +80,7 @@ paz::Bytes paz::uncompress(const Bytes& src)
     unsigned long destLen = 0;
     for(unsigned long i = 0; i < 4; ++i)
     {
-        destLen |= (unsigned long)src[i] << 8*i;
+        destLen |= static_cast<unsigned long>(src[i]) << 8*i;
     }
 
     if(!destLen)
@@ -143,7 +143,7 @@ void paz::Archive::load(const std::string& path)
     unsigned long dataStart = 0;
     for(unsigned long i = 0; i < 4; ++i)
     {
-        dataStart |= (unsigned long)src[i] << 8*i;
+        dataStart |= static_cast<unsigned long>(src[i]) << 8*i;
     }
     std::stringstream ss(uncompress(Bytes(src.begin() + 4, src.begin() + 4 +
         dataStart)).str());
@@ -202,14 +202,16 @@ void paz::Archive::write(const std::string& path) const
     const unsigned long dataStart = buf.size();
     for(unsigned long i = 0; i < 4; ++i)
     {
-        out << (unsigned char)(dataStart >> 8*i);
+        out << static_cast<unsigned char>(dataStart >> 8*i);
     }
-    out.write((char*)buf.data(), buf.size());
+    out.write(reinterpret_cast<char*>(const_cast<unsigned char*>(buf.data())),
+        buf.size());
 
     // Write blocks to file.
     for(const auto& n : _blocks)
     {
-        out.write((char*)n.second.data(), n.second.size());
+        out.write(reinterpret_cast<char*>(const_cast<unsigned char*>(n.second.
+            data())), n.second.size());
     }
 }
 
