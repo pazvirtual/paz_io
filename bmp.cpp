@@ -57,8 +57,8 @@ paz::Image<std::uint8_t, 4> paz::parse_bmp(const Bytes& content)
         {
             for(int k = 0; k < 3; ++k)
             {
-                res[4*(width*i + j) + k] = content[3*((extraBytes + width)*i +
-                    j) + 2 - k];
+                res[4*(width*i + j) + k] = content[start + (3*width +
+                    extraBytes)*i + 3*j + 2 - k];
             }
             res[4*(width*i + j) + 3] = 255;
         }
