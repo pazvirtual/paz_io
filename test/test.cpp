@@ -10,7 +10,6 @@
     std::cout << "Passed " << test << std::endl; \
     ++test;
 
-
 static const std::string ArchivePath = "test-archive.paz";
 static const std::string TestString = "Abcdefg.";
 static const std::unordered_map<std::string, paz::Bytes> TestData =
