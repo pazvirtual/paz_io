@@ -246,4 +246,10 @@ void paz::parse_obj(const Bytes& content, std::vector<std::string>& names, std::
             }
         }
     }
+
+    // Free unused capacity.
+    positions.shrink_to_fit();
+    uvs.shrink_to_fit();
+    normals.shrink_to_fit();
+    materials.shrink_to_fit();
 }

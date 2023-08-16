@@ -22,6 +22,7 @@ std::string paz::Bytes::str() const
 
     // Remove all remaining `\r`.
     s.erase(std::remove(s.begin(), s.end(), '\r'), s.end());
+    s.shrink_to_fit();
 
     return s;
 }
