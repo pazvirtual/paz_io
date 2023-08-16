@@ -11,7 +11,7 @@ else
 endif
 CXXVER := 14
 OPTIM := fast
-CXXFLAGS := -std=c++$(CXXVER) -O$(OPTIM) -Wall -Wextra -Wno-missing-braces
+CXXFLAGS := -std=c++$(CXXVER) -O$(OPTIM) -Wall -Wextra -Wno-missing-braces -Wold-style-cast
 ifeq ($(OSPRETTY), macOS)
     CXXFLAGS += -mmacosx-version-min=10.10
 else
