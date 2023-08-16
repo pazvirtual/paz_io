@@ -4,15 +4,11 @@
 #include <numeric>
 #include <algorithm>
 
-void paz::load_obj(
-    const std::string& path,
-    std::vector<std::string>& names,
-    std::vector<std::vector<float>>& positions,
-    std::vector<std::vector<float>>& uvs,
-    std::vector<std::vector<float>>& normals,
-    std::vector<std::vector<unsigned int>> materials,
-    std::vector<std::string>& materialNames,
-    std::vector<std::string>& materialLibs)
+void paz::load_obj(const std::string& path, std::vector<std::string>& names,
+    std::vector<std::vector<float>>& positions, std::vector<std::vector<float>>&
+    uvs, std::vector<std::vector<float>>& normals, std::vector<std::vector<
+    unsigned int>> materials, std::vector<std::string>& materialNames, std::
+    vector<std::string>& materialLibs)
 {
     std::ifstream in(path);
     if(!in)
@@ -181,63 +177,23 @@ void paz::load_obj(
     }
 }
 
-void paz::load_obj(
-    const std::string& path,
-    std::vector<std::string>& names,
-    std::vector<std::vector<float>>& positions,
-    std::vector<std::vector<float>>& uvs,
-    std::vector<std::vector<float>>& normals,
-    std::vector<std::vector<unsigned int>> materials,
-    std::vector<std::string>& materialNames,
-    std::vector<std::string>& materialLibs,
-    std::vector<std::vector<unsigned int>>& indices)
+void paz::load_obj(const std::string& path, std::vector<std::string>& names,
+    std::vector<std::vector<float>>& positions, std::vector<std::vector<float>>&
+    uvs, std::vector<std::vector<float>>& normals, std::vector<std::vector<
+    unsigned int>> materials, std::vector<std::string>& materialNames, std::
+    vector<std::string>& materialLibs, std::vector<std::vector<unsigned int>>&
+    indices)
 {
-#if 0
     load_obj(path, names, positions, uvs, normals, materials, materialNames,
         materialLibs);
 
     // Remove duplicates and set indices.
-    indices.resize(positions.size());
-    std::iota(indices.begin(), indices.end(), 0u);
-    std::size_t sz1 = positions.size();
-    for(std::size_t i = 0; i < sz1; ++i)
+    const std::size_t numObjects = names.size();
+    for(std::size_t i = 0; i < numObjects; ++i)
     {
-        std::size_t j = i + 1;
-        while(true)
-        {
-            j = std::find(positions.begin() + j, positions.end(), positions[i])
-                - positions.begin();
-            if(j >= sz1)
-            {
-                break;
-            }
-            else if(uvs[j] == uvs[i] && normals[j] == normals[i] && materials[j]
-                == materials[i])
-            {
-                positions.erase(positions.begin() + j);
-                uvs.erase(uvs.begin() + j);
-                normals.erase(normals.begin() + j);
-                materials.erase(materials.begin() + j);
-                --sz1;
-                for(std::size_t k = 0, sz2 = indices.size(); k < sz2; ++k)
-                {
-                    if(indices[k] == j)
-                    {
-                        indices[k] = i;
-                    }
-                    else if(indices[k] > j)
-                    {
-                        --indices[k];
-                    }
-                }
-            }
-            else
-            {
-                ++j;
-            }
-        }
+        std::size_t numVertices = positions.size()/4;
+        indices[i].resize(numVertices);
+        std::iota(indices[i].begin(), indices[i].end(), 0u);
+        // ...
     }
-#else
-    throw std::logic_error("NOT IMPLEMENTED");
-#endif
 }
