@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <map>
+#include <limits>
 
 #ifdef compress
 #undef compress
@@ -20,7 +21,7 @@ static std::size_t compress_bound(const std::size_t srcLen)
         1)*5);
 }
 
-std::string mz_status(int status) noexcept
+static std::string mz_status(int status) noexcept
 {
     switch(status)
     {
@@ -106,18 +107,18 @@ paz::Archive::Archive(const std::string& path) : Archive(load_file(path)) {}
 
 paz::Archive::Archive(const Bytes& src)
 {
-    if(src.empty())
+    if(src.size() < 7 || src[0] != 'P' || src[1] != 'A' || src[2] != 'Z')
     {
-        throw std::runtime_error("Archive is empty.");
+        throw std::runtime_error("Not a valid PAZ Archive file.");
     }
 
     // Get contents list.
     unsigned long dataStart = 0;
     for(unsigned long i = 0; i < 4; ++i)
     {
-        dataStart |= static_cast<unsigned long>(src[i]) << 8*i;
+        dataStart |= static_cast<unsigned long>(src[i + 3]) << 8*i;
     }
-    std::stringstream ss(uncompress(Bytes(src.begin() + 4, src.begin() + 4 +
+    std::stringstream ss(uncompress(Bytes(src.begin() + 7, src.begin() + 7 +
         dataStart)).str());
     std::map<std::size_t, std::string> contents;
     std::string line;
@@ -128,7 +129,7 @@ paz::Archive::Archive(const Bytes& src)
         std::getline(lineSs, name, ' ');
         std::string str;
         std::getline(lineSs, str);
-        contents[4 + dataStart + std::stoull(str)] = name;
+        contents[7 + dataStart + std::stoull(str)] = name;
     }
 
     // Get compressed blocks.
@@ -194,6 +195,7 @@ void paz::Archive::write(const std::string& path) const
     // Compress and write contents list to file.
     const Bytes buf = compress(contents.str());
     const unsigned long dataStart = buf.size();
+    out << "PAZ";
     for(unsigned long i = 0; i < 4; ++i)
     {
         out << static_cast<unsigned char>(dataStart >> 8*i);
