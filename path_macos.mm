@@ -18,7 +18,7 @@ std::array<std::string, 3> paz::split_path(const std::string& path)
             NSURL* p = [NSURL URLWithString:[NSString stringWithUTF8String:path.
                 c_str()]];
             NSString* f = [p lastPathComponent];
-            const std::string dir = [[p URLByDeletingLastPathComponent]
+            const std::string dir = [[[p URLByDeletingLastPathComponent] path]
                 UTF8String];
             const std::string name = [[f stringByDeletingPathExtension]
                 UTF8String];
@@ -36,7 +36,7 @@ std::array<std::string, 3> paz::split_path(const std::string& path)
     catch(const std::exception& e)
     {
         throw std::runtime_error("Failed to split path: " + std::string(e.
-            what());
+            what()));
     }
 }
 
