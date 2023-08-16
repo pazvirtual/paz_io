@@ -10,6 +10,12 @@
     std::cout << "Passed " << test << std::endl; \
     ++test;
 
+static const std::array<std::string, 2> TestPaths = {"a/b/c.d", ".a"};
+static const std::array<std::array<std::string, 3>, 2> TestPathElems =
+{{
+    {"a/b", "c", "d"},
+    {"", ".a", ""}
+}};
 static const std::string ArchivePath = "test-archive.paz";
 static const std::string TestString = "Abcdefg.";
 static const std::unordered_map<std::string, paz::Bytes> TestData =
@@ -23,6 +29,20 @@ static constexpr int ImgRes = 10;
 int main(int, char** argv)
 {
     int test = 1;
+
+    // Split some paths.
+    for(std::size_t i = 0; i < TestPaths.size(); ++i)
+    {
+        try
+        {
+            const auto elems = paz::split_path(TestPaths[i]);
+            if(elems != TestPathElems[i])
+            {
+               throw std::runtime_error("Path elements do not match.");
+            }
+        }
+        CATCH
+    }
 
     // Split path to get working directory.
     std::string appDir;

@@ -15,8 +15,13 @@ std::array<std::string, 3> paz::split_path(const std::string& path)
     {
         const std::filesystem::path p(path);
         const auto f = p.filename();
-        return {p.parent_path().string(), f.stem().string(), f.extension().
-            string()};
+        std::string ext = f.extension().string();
+        // Remove period from extension.
+        if(!ext.empty())
+        {
+            ext.erase(0, 1);
+        }
+        return {p.parent_path().string(), f.stem().string(), ext};
     }
     catch(const std::exception& e)
     {
