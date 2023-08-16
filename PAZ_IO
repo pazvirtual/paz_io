@@ -31,6 +31,7 @@ namespace paz
     public:
         Archive();
         Archive(const std::string& path);
+        Archive(const Bytes& src);
         void add(const std::string& name, const Bytes& data);
         Bytes get(const std::string& name) const;
         void load(const std::string& path);

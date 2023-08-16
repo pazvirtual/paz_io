@@ -103,40 +103,13 @@ paz::Bytes paz::uncompress(const Bytes& src)
 
 paz::Archive::Archive() {}
 
-paz::Archive::Archive(const std::string& path)
+paz::Archive::Archive(const std::string& path) : Archive(load_file(path)) {}
+
+paz::Archive::Archive(const Bytes& src)
 {
-    load(path);
-}
-
-void paz::Archive::add(const std::string& name, const Bytes& data)
-{
-    if(_blocks.count(name))
-    {
-        throw std::runtime_error("Archive already contains block \"" + name +
-            "\".");
-    }
-
-    _blocks[name] = compress(data);
-}
-
-paz::Bytes paz::Archive::get(const std::string& name) const
-{
-    if(!_blocks.count(name))
-    {
-        throw std::runtime_error("Archive does not contain block \"" + name +
-            "\".");
-    }
-
-    return uncompress(_blocks.at(name));
-}
-
-void paz::Archive::load(const std::string& path)
-{
-    // Load data from input file.
-    const Bytes src = load_file(path);
     if(src.empty())
     {
-        throw std::runtime_error("Archive \"" + path + "\" is empty.");
+        throw std::runtime_error("Archive is empty.");
     }
 
     // Get contents list.
@@ -172,6 +145,28 @@ void paz::Archive::load(const std::string& path)
         _blocks.try_emplace(it->second, src.begin() + it->first, next ==
             contents.end() ? src.end() : src.begin() + next->first);
     }
+}
+
+void paz::Archive::add(const std::string& name, const Bytes& data)
+{
+    if(_blocks.count(name))
+    {
+        throw std::runtime_error("Archive already contains block \"" + name +
+            "\".");
+    }
+
+    _blocks[name] = compress(data);
+}
+
+paz::Bytes paz::Archive::get(const std::string& name) const
+{
+    if(!_blocks.count(name))
+    {
+        throw std::runtime_error("Archive does not contain block \"" + name +
+            "\".");
+    }
+
+    return uncompress(_blocks.at(name));
 }
 
 void paz::Archive::write(const std::string& path) const
