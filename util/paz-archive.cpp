@@ -5,22 +5,29 @@
 #include <fcntl.h>
 #include <dirent.h>
 
+static const std::string HelpMsg = 1 + R"===(
+Usage:
+    paz-archive [options] <files> <output path>
+    paz-archive [options] <directory> [output path = <directory>.pazarchive]
+
+Options:
+    -c/--convert: Convert each OBJ object into a PAZ model
+)===";
+
 int main(int argc, char** argv)
 {
-    // Check for options.
-    const std::string arg1 = argv[1];
-    const bool convert = argc >= 2 && (arg1 == "-c" || arg1 == "--convert");
-
-    // Print help and return if invalid arguments.
-    if(argc < convert + 2)
+    if(argc < 2)
     {
-        std::cout << std::endl << "Usage:" << std::endl << "    paz-archive [op"
-            "tions] <files> <output path>" << std::endl << "    paz-archive [op"
-            "tions] <directory> [output path = <directory>.pazarchive]" << std::
-            endl << std::endl << "Options: " << std::endl << "    -c/--convert:"
-            " Convert each OBJ object into a PAZ model" << std::endl << std::
-            endl;
+        std::cout << std::endl << HelpMsg << std::endl;
         return 1;
+    }
+
+    // Check for options.
+    bool convert = false;
+    if(argc >= 2)
+    {
+        const std::string arg1 = argv[1];
+        convert = arg1 == "-c" || arg1 == "--convert";
     }
 
     // Figure out if this is a directory.
@@ -66,10 +73,15 @@ int main(int argc, char** argv)
             return 1;
         }
     }
-    else
+    else if(argc > convert + 2)
     {
         files = std::unordered_set<std::string>(argv + convert + 1, argv + argc
             - 1);
+    }
+    else
+    {
+        std::cout << std::endl << HelpMsg << std::endl;
+        return 1;
     }
 
     // Compress input files.
