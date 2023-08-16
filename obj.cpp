@@ -4,10 +4,24 @@
 #include <numeric>
 #include <algorithm>
 
+static std::size_t find_vertex(float x, float y, float z, std::vector<float>& v,
+    std::size_t start)
+{
+    const std::size_t numVertices = v.size()/4;
+    for(std::size_t i = start; i < numVertices; ++i)
+    {
+        if(v[4*i] == x && v[4*i + 1] == y && v[4*i + 2] == z)
+        {
+            return i;
+        }
+    }
+    return v.size();
+}
+
 void paz::load_obj(const std::string& path, std::vector<std::string>& names,
     std::vector<std::vector<float>>& positions, std::vector<std::vector<float>>&
     uvs, std::vector<std::vector<float>>& normals, std::vector<std::vector<
-    unsigned int>> materials, std::vector<std::string>& materialNames, std::
+    unsigned int>>& materials, std::vector<std::string>& materialNames, std::
     vector<std::string>& materialLibs)
 {
     std::ifstream in(path);
@@ -101,8 +115,8 @@ void paz::load_obj(const std::string& path, std::vector<std::string>& names,
         {
             curMaterial = line.substr(7);
             curMtlIdx = std::find(materialNames.begin(), materialNames.end(),
-                curMaterial) - materialNames.begin();
-            if(curMtlIdx == materialNames.size())
+                curMaterial) - materialNames.begin() + 1u;
+            if(curMtlIdx > materialNames.size())
             {
                 materialNames.push_back(curMaterial);
             }
@@ -171,7 +185,7 @@ void paz::load_obj(const std::string& path, std::vector<std::string>& names,
                         uvs.back().push_back(0.f);
                     }
                 }
-                materials.back().push_back(curMtlIdx + 1u);
+                materials.back().push_back(curMtlIdx);
             }
         }
     }
@@ -180,7 +194,7 @@ void paz::load_obj(const std::string& path, std::vector<std::string>& names,
 void paz::load_obj(const std::string& path, std::vector<std::string>& names,
     std::vector<std::vector<float>>& positions, std::vector<std::vector<float>>&
     uvs, std::vector<std::vector<float>>& normals, std::vector<std::vector<
-    unsigned int>> materials, std::vector<std::string>& materialNames, std::
+    unsigned int>>& materials, std::vector<std::string>& materialNames, std::
     vector<std::string>& materialLibs, std::vector<std::vector<unsigned int>>&
     indices)
 {
@@ -189,11 +203,53 @@ void paz::load_obj(const std::string& path, std::vector<std::string>& names,
 
     // Remove duplicates and set indices.
     const std::size_t numObjects = names.size();
+    indices.resize(numObjects);
     for(std::size_t i = 0; i < numObjects; ++i)
     {
-        std::size_t numVertices = positions.size()/4;
+        std::size_t numVertices = positions[i].size()/4;
         indices[i].resize(numVertices);
         std::iota(indices[i].begin(), indices[i].end(), 0u);
-        // ...
+        for(std::size_t j = 0; j < numVertices; ++j)
+        {
+            std::size_t k = j + 1;
+            while(true)
+            {
+                k = find_vertex(positions[i][4*j], positions[i][4*j + 1],
+                    positions[i][4*j + 2], positions[i], k);
+                if(k >= numVertices)
+                {
+                    break;
+                }
+                else if(uvs[i][2*k] == uvs[i][2*j] && uvs[i][2*k + 1] == uvs[i][
+                    2*j + 1] && normals[i][4*k] == normals[i][4*j] && normals[
+                    i][4*k + 1] == normals[i][4*j + 1] && normals[i][4*k + 2] ==
+                    normals[i][4*j + 2] && materials[i][k] == materials[i][j])
+                {
+                    positions[i].erase(positions[i].begin() + 4*k, positions[i].
+                        begin() + 4*(k + 1));
+                    uvs[i].erase(uvs[i].begin() + 2*k, uvs[i].begin() + 2*(k +
+                        1));
+                    normals[i].erase(normals[i].begin() + 4*k, normals[i].
+                        begin() + 4*(k + 1));
+                    materials[i].erase(materials[i].begin() + k);
+                    --numVertices;
+                    for(auto& n : indices[i])
+                    {
+                        if(n == k)
+                        {
+                            n = j;
+                        }
+                        else if(n > k)
+                        {
+                            --n;
+                        }
+                    }
+                }
+                else
+                {
+                    ++k;
+                }
+            }
+        }
     }
 }
