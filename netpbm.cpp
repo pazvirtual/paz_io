@@ -28,7 +28,7 @@ paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
     // Check format.
     if(content[0] != 'P' || !(content[1] == '1' || content[1] == '4'))
     {
-        throw std::runtime_error("This is not a plain PBM.");
+        throw std::runtime_error("This is not a PBM.");
     }
     const bool isBinary = content[1] == '4';
 
