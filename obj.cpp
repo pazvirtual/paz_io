@@ -57,9 +57,9 @@ void paz::load_obj(
                 throw std::runtime_error("Object \"" + n + "\" already defined."
                     );
             }
-            numPositions += curPositions.size();
-            numUvs += curUvs.size();
-            numNormals += curNormals.size();
+            numPositions += curPositions.size()/3;
+            numUvs += curUvs.size()/2;
+            numNormals += curNormals.size()/3;
             curPositions.clear();
             curUvs.clear();
             curNormals.clear();
