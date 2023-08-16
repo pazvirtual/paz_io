@@ -8,6 +8,12 @@
 
 namespace paz
 {
+    template<typename T, typename U>
+    using require_same = std::enable_if_t<std::is_same<T, U>::value>;
+
+    template<typename T, typename U>
+    using require_different = std::enable_if_t<!std::is_same<T, U>::value>;
+
     class Bytes : public std::vector<unsigned char>
     {
         using std::vector<unsigned char>::vector;
@@ -32,7 +38,72 @@ namespace paz
         void clear();
     };
 
+    template<typename T, unsigned int NumChannels>
+    class Image
+    {
+        std::vector<T> _pixels;
+        unsigned int _rows;
+
+    public:
+        Image() {}
+        Image(const T* data, unsigned int width, unsigned int height) : _pixels(
+            data, data + width*height*NumChannels), _rows(height) {}
+
+        template<typename U>
+        void fill(const U& data, unsigned int width, unsigned int height)
+        {
+            _pixels = std::vector<T>(data.begin(), data.end());
+            _rows = height;
+        }
+        template<typename U>
+        void fill(const U* data, unsigned int width, unsigned int height)
+        {
+            _pixels = std::vector<T>(data, data + width*height*NumChannels);
+            _rows = height;
+        }
+
+        const T* data() const
+        {
+            return _pixels.data();
+        }
+
+        unsigned int width() const
+        {
+            return _pixels.size()/NumChannels/_rows;
+        }
+
+        unsigned int height() const
+        {
+            return _rows;
+        }
+
+        auto begin() const
+        {
+            return _pixels.begin();
+        }
+
+        auto end() const
+        {
+            return _pixels.end();
+        }
+
+        template<typename U, require_same<T, U>* = nullptr>
+        const auto& cast() const
+        {
+            return *this;
+        }
+        template<typename U, require_different<T, U>* = nullptr>
+        auto cast() const
+        {
+            Image<U, NumChannels> image;
+            image.fill(_pixels, width(), height());
+            return image;
+        }
+    };
+
     std::array<std::string, 3> split_path(const std::string& path);
+
+    Image<unsigned int, 1> load_pbm(const std::string& path);
 
     void write_bmp(const std::string& path, unsigned int width, const std::
         vector<float>& rgb);
