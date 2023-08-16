@@ -132,17 +132,8 @@ paz::Bytes paz::Archive::get(const std::string& name) const
 
 void paz::Archive::load(const std::string& path)
 {
-    // Open input file.
-    std::ifstream file(path, std::ios::binary);
-    if(!file)
-    {
-        throw std::runtime_error("Failed to open input file \"" + path + "\".");
-    }
-
-    // Extract input data and close file.
-    const Bytes src((std::istreambuf_iterator<char>(file)), std::
-        istreambuf_iterator<char>());
-    file.close();
+    // Load data from input file.
+    const Bytes src = load_file(path);
     if(src.empty())
     {
         throw std::runtime_error("Archive \"" + path + "\" is empty.");
@@ -154,8 +145,8 @@ void paz::Archive::load(const std::string& path)
     {
         dataStart |= (unsigned long)src[i] << 8*i;
     }
-    std::stringstream ss(paz::uncompress(Bytes(src.begin() + 4, src.begin() + 4
-        + dataStart)).str());
+    std::stringstream ss(uncompress(Bytes(src.begin() + 4, src.begin() + 4 +
+        dataStart)).str());
     std::map<std::size_t, std::string> contents;
     std::string line;
     while(std::getline(ss, line))
@@ -207,7 +198,7 @@ void paz::Archive::write(const std::string& path) const
     }
 
     // Compress and write contents list to file.
-    const Bytes buf = paz::compress(contents.str());
+    const Bytes buf = compress(contents.str());
     const unsigned long dataStart = buf.size();
     for(unsigned long i = 0; i < 4; ++i)
     {
