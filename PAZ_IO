@@ -37,6 +37,8 @@ namespace paz
     std::string load_block(const std::string& path, const std::string& name);
 
     std::string load_text(const std::string& path);
+
+    void remove(const std::string& path);
 }
 
 #endif

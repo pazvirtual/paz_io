@@ -1,6 +1,16 @@
 #include "PAZ_IO"
 #include <fstream>
 
+#define CATCH \
+    catch(const std::exception& e) \
+    { \
+        std::cerr << "Failed " << test << ": " << e.what() << std::endl; \
+        return 1; \
+    } \
+    std::cout << "Passed " << test << std::endl; \
+    ++test;
+
+
 static const std::string ArchivePath = "test-archive.paz";
 static const std::string TestString = "Abcdefg.";
 static const std::unordered_map<std::string, std::string> TestData =
@@ -11,17 +21,15 @@ static const std::unordered_map<std::string, std::string> TestData =
 
 int main(int, char** argv)
 {
+    int test = 1;
+
     // Test 1: Splitting path to get working directory.
     std::string appDir;
     try
     {
         appDir = paz::split_path(argv[0])[0];
     }
-    catch(const std::exception& e)
-    {
-        std::cerr << "Failed 1: " << e.what() << std::endl;
-    }
-    std::cout << "Passed 1" << std::endl;
+    CATCH
 
     // Test 2: Compressing and decompressing text.
     std::string res;
@@ -32,12 +40,7 @@ int main(int, char** argv)
             throw std::runtime_error("Strings do not match.");
         }
     }
-    catch(const std::exception& e)
-    {
-        std::cerr << "Failed 2: " << e.what() << std::endl;
-        return 1;
-    }
-    std::cout << "Passed 2" << std::endl;
+    CATCH
 
     // Test 3: Writing an archive.
     try
@@ -49,12 +52,7 @@ int main(int, char** argv)
         }
         paz::write_archive(appDir + "/" + ArchivePath, data);
     }
-    catch(const std::exception& e)
-    {
-        std::cerr << "Failed 3: " << e.what() << std::endl;
-        return 1;
-    }
-    std::cout << "Passed 3" << std::endl;
+    CATCH
 
     // Test 4: Loading an archive's contents list.
     try
@@ -73,12 +71,7 @@ int main(int, char** argv)
             }
         }
     }
-    catch(const std::exception& e)
-    {
-        std::cerr << "Failed 4: " << e.what() << std::endl;
-        return 1;
-    }
-    std::cout << "Passed 4" << std::endl;
+    CATCH
 
     // Test 5: Loading data from an archive.
     try
@@ -93,10 +86,12 @@ int main(int, char** argv)
             }
         }
     }
-    catch(const std::exception& e)
+    CATCH
+
+    // Test 6: Deleting a file.
+    try
     {
-        std::cerr << "Failed 5: " << e.what() << std::endl;
-        return 1;
+        paz::remove(appDir + "/" + ArchivePath);
     }
-    std::cout << "Passed 5" << std::endl;
+    CATCH
 }
