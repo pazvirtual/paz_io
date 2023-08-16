@@ -74,8 +74,8 @@ namespace paz
             }
         }
         template<typename U, require_different<T, U>* = nullptr>
-        explicit Image(const Image<U, NumChannels>& image) : std::vector<T>(
-            image.begin(), image.end()), _rows(image.height()) {}
+        explicit Image(const Image<U, NumChannels>& img) : std::vector<T>(img.
+            begin(), img.end()), _rows(img.height()) {}
 
         int width() const
         {
@@ -92,7 +92,7 @@ namespace paz
 
     Image<std::uint8_t, 1> load_pbm(const std::string& path);
 
-    void write_bmp(const std::string& path, const Image<float, 3>& image);
+    void write_bmp(const std::string& path, const Image<std::uint8_t, 3>& img);
 
     // Positions and normals are padded for graphics compatibility ([vx, vy, vz,
     // 1] and [nx, ny, nz, 0]) and materials are one-indexed (0: unassigned, 1:

@@ -3,19 +3,18 @@
 #include <fstream>
 #include <cmath>
 
-void paz::write_bmp(const std::string& path, const Image<float, 3>& image)
+void paz::write_bmp(const std::string& path, const Image<std::uint8_t, 3>& img)
 {
-    unsigned int extraBytes = 4 - ((3*image.width())%4);
+    unsigned int extraBytes = 4 - ((3*img.width())%4);
     if(extraBytes == 4)
     {
         extraBytes = 0;
     }
 
-    const unsigned int paddedSize = (3*image.width() + extraBytes)*image.
-        height();
+    const unsigned int paddedSize = (3*img.width() + extraBytes)*img.height();
     const std::array<unsigned int, 13> headers = {paddedSize + 54u, 0, 54, 40,
-        static_cast<unsigned int>(image.width()), static_cast<unsigned int>(
-        image.height()), 0, 0, paddedSize, 0, 0, 0, 0};
+        static_cast<unsigned int>(img.width()), static_cast<unsigned int>(img.
+        height()), 0, 0, paddedSize, 0, 0, 0, 0};
 
     std::ofstream out(path, std::ios::binary);
     if(!out)
@@ -46,14 +45,13 @@ void paz::write_bmp(const std::string& path, const Image<float, 3>& image)
         out.put((headers[i]&0xff000000u) >> 24);
     }
 
-    for(int y = 0; y < image.height(); ++y)
+    for(int y = 0; y < img.height(); ++y)
     {
-        for(int x = 0; x < image.width(); ++x)
+        for(int x = 0; x < img.width(); ++x)
         {
             for(int i = 2; i >= 0; --i)
             {
-                out.put(std::min(static_cast<unsigned int>(std::round(std::max(
-                    image[3*(y*image.width() + x) + i], 0.f)*255.f)), 255u));
+                out.put(img[3*(y*img.width() + x) + i]);
             }
         }
         for(unsigned int i = 0; i < extraBytes; ++i)
