@@ -89,7 +89,7 @@ void paz::parse_obj(const Bytes& content, std::vector<std::string>& names, std::
         else if(line.substr(0, 3) == "vt ")
         {
             std::stringstream ss(line.substr(3));
-            for(int i = 0; i < 3; ++i)
+            for(int i = 0; i < 2; ++i)
             {
                 double n;
                 ss >> n;
