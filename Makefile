@@ -51,8 +51,8 @@ REINSTALLHEADER := $(shell cmp -s $(PROJNAME) $(INCLPATH)/$(PROJNAME); echo $$?)
 print-% : ; @echo $* = $($*)
 
 default: lib$(LIBNAME).a
-	make -C test
-	make -C util
+	$(MAKE) -C test
+	$(MAKE) -C util
 	test/test
 
 lib$(LIBNAME).a: $(OBJ)
@@ -63,11 +63,11 @@ ifneq ($(REINSTALLHEADER), 0)
 install: $(PROJNAME) lib$(LIBNAME).a
 	cp $(PROJNAME) $(INCLPATH)/
 	cp lib$(LIBNAME).a $(LIBPATH)/
-	make -C util install
+	$(MAKE) -C util install
 else
 install: $(PROJNAME) lib$(LIBNAME).a
 	cp lib$(LIBNAME).a $(LIBPATH)/
-	make -C util install
+	$(MAKE) -C util install
 endif
 
 analyze: $(OBJCSRC)
@@ -84,8 +84,8 @@ analyze: $(OBJCSRC)
 
 clean:
 	$(RM) $(OBJ) lib$(LIBNAME).a
-	make -C test clean
-	make -C util clean
+	$(MAKE) -C test clean
+	$(MAKE) -C util clean
 
 zip: $(ZIPCONTENTS)
 	zip -j $(ZIPNAME).zip $(ZIPCONTENTS)
