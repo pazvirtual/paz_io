@@ -19,12 +19,12 @@ else
     endif
     CXXFLAGS += -pthread
 endif
-INCL := -I..
-LIBS := ../libpazio.a
+CXXFLAGS += -I..
+LDLIBS := ../libpazio.a
 ifeq ($(OSPRETTY), macOS)
-    LIBS += -framework Cocoa
+    LDLIBS += -framework Cocoa
 else
-    LIBS += -lstdc++fs
+    LDLIBS += -lstdc++fs
 endif
 
 SRC := $(wildcard *.cpp)
@@ -33,9 +33,6 @@ EXE := $(SRC:.cpp=)
 .PHONY: $(SRC)
 
 all: $(EXE)
-
-%: %.cpp
-	$(CXX) -o $@ $< $(CXXFLAGS) $(INCL) $(LIBS)
 
 clean:
 	$(RM) $(EXE)
