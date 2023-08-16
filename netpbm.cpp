@@ -1,14 +1,15 @@
 #include "PAZ_IO"
 #include <sstream>
 
-// Need to add support for comments and binary (`P4`) PBMs.
+// Need to add support for comments.
 paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
 {
     // Check format.
-    if(content[0] != 'P' || content[1] != '1')
+    if(content[0] != 'P' || !(content[1] == '1' || content[1] == '4'))
     {
         throw std::runtime_error("This is not a plain PBM.");
     }
+    const bool isBinary = content[1] == '4';
 
     // Create input stream.
     std::istringstream iss(content.str().substr(2));
@@ -21,19 +22,40 @@ paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
     // Get data.
     Image<std::uint8_t, 1> image(width, height);
     std::fill(image.begin(), image.end(), 0);
-    char c;
     unsigned int n = 0;
-    while(iss >> c && n < width*height)
+    if(isBinary)
     {
-        if(c == '0')
+        std::uint8_t b;
+        while(iss >> b && n < width*height)
         {
-            unsigned int x = n%width;
-            unsigned int y = n/width;
-            image[width*(height - 1 - y) + x] = 255;
+            for(int i = 0; i < 8; ++i)
+            {
+                const unsigned int x = n%width;
+                const unsigned int y = n/width;
+                image[width*(height - 1 - y) + x] = !((b >> (7 - i))&1)*255;
+                ++n;
+                if(n == width*(y + 1))
+                {
+                    break;
+                }
+            }
         }
-        if(c == '0' || c == '1')
+    }
+    else
+    {
+        char c;
+        while(iss >> c && n < width*height)
         {
-            ++n;
+            if(c == '0')
+            {
+                const unsigned int x = n%width;
+                const unsigned int y = n/width;
+                image[width*(height - 1 - y) + x] = 255;
+            }
+            if(c == '0' || c == '1')
+            {
+                ++n;
+            }
         }
     }
 
