@@ -29,7 +29,7 @@ namespace paz
         std::unordered_map<std::string, Bytes> _blocks;
 
     public:
-        Archive();
+        Archive() = default;
         Archive(const std::string& path);
         Archive(const Bytes& src);
         void add(const std::string& name, const Bytes& data);

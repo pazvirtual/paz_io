@@ -10,13 +10,12 @@ else
     LIBPATH := /usr/local/lib
 endif
 CXXVER := 14
-OPTIM := fast
-CXXFLAGS := -std=c++$(CXXVER) -O$(OPTIM) -Wall -Wextra -Wno-missing-braces -Wold-style-cast
+CXXFLAGS := -std=c++$(CXXVER) -Ofast -Wall -Wextra -Wno-missing-braces -Wold-style-cast
 ifeq ($(OSPRETTY), macOS)
     CXXFLAGS += -mmacosx-version-min=10.10
 else
     ifeq ($(OSPRETTY), Windows)
-        CXXFLAGS += -Wno-deprecated-copy
+        CXXFLAGS += -Wno-deprecated-copy -static
     endif
     CXXFLAGS += -pthread
 endif

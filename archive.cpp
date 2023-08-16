@@ -20,7 +20,7 @@ static std::size_t compress_bound(const std::size_t srcLen)
         1)*5);
 }
 
-std::string mz_status(int status)
+std::string mz_status(int status) noexcept
 {
     switch(status)
     {
@@ -34,8 +34,9 @@ std::string mz_status(int status)
         CASE_STRING(Z_BUF_ERROR)
         CASE_STRING(Z_VERSION_ERROR)
         CASE_STRING(Z_PARAM_ERROR)
+        default: return "Status code " + std::to_string(status) + " not recogni"
+            "zed";
     }
-    return "Status code " + std::to_string(status) + " not recognized";
 }
 
 paz::Bytes paz::compress(const Bytes& src)
@@ -100,8 +101,6 @@ paz::Bytes paz::uncompress(const Bytes& src)
 
     return buf;
 }
-
-paz::Archive::Archive() {}
 
 paz::Archive::Archive(const std::string& path) : Archive(load_file(path)) {}
 
