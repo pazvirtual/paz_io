@@ -4,3 +4,4 @@
 *.zip
 *.paz
 test/archive-test
+util/paz-archive

@@ -13,7 +13,7 @@
 #define CASE_STRING(x) case x: return #x;
 
 // This upper-bound-calculating function taken from Miniz.
-std::size_t compress_bound(const std::size_t srcLen)
+static std::size_t compress_bound(const std::size_t srcLen)
 {
     return std::max(128 + (srcLen*110)/100, 128 + srcLen + ((srcLen/(31*1024)) +
         1)*5);

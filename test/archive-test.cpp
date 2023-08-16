@@ -9,8 +9,10 @@ static const std::unordered_map<std::string, std::string> TestData =
     {"file2.whatever", "other stuff"}
 };
 
-int main()
+int main(int, char** argv)
 {
+    const std::string appDir = paz::split_path(argv[0])[0];
+
     // Test 1: Compressing and decompressing text.
     std::string res;
     try
@@ -35,12 +37,7 @@ int main()
         {
             data[n.first] = paz::compress(n.second);
         }
-        std::ofstream out(ArchivePath, std::ios::binary);
-        if(!out)
-        {
-            throw std::runtime_error("Failed to open \"" + ArchivePath + "\".");
-        }
-        paz::write_archive(ArchivePath, data);
+        paz::write_archive(appDir + "/" + ArchivePath, data);
     }
     catch(const std::exception& e)
     {
@@ -53,7 +50,7 @@ int main()
     try
     {
         const std::unordered_map<std::string, std::size_t> contents = paz::
-            load_contents_list(ArchivePath);
+            load_contents_list(appDir + "/" + ArchivePath);
         if(contents.size() != TestData.size())
         {
             throw std::runtime_error("Number of blocks does not match.");
@@ -78,7 +75,8 @@ int main()
     {
         for(const auto& n : TestData)
         {
-            const std::string data = paz::load_block(ArchivePath, n.first);
+            const std::string data = paz::load_block(appDir + "/" + ArchivePath,
+                n.first);
             if(data != n.second)
             {
                 throw std::runtime_error("Strings do not match.");
