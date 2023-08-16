@@ -23,7 +23,7 @@ int main(int, char** argv)
 {
     int test = 1;
 
-    // Test 1: Splitting path to get working directory.
+    // Split path to get working directory.
     std::string appDir;
     try
     {
@@ -31,8 +31,7 @@ int main(int, char** argv)
     }
     CATCH
 
-    // Test 2: Compressing and decompressing text.
-    std::string res;
+    // Convert text to binary data, compress, decompress, and convert to text.
     try
     {
         if(paz::uncompress(paz::compress(TestString)).str() != TestString)
@@ -42,7 +41,7 @@ int main(int, char** argv)
     }
     CATCH
 
-    // Test 3: Writing an archive.
+    // Write an archive.
     try
     {
         paz::Archive archive;
@@ -54,7 +53,7 @@ int main(int, char** argv)
     }
     CATCH
 
-    // Test 4: Loading an archive.
+    // Load an archive.
     try
     {
         const paz::Archive archive(appDir + "/" + ArchivePath);
@@ -62,13 +61,13 @@ int main(int, char** argv)
         {
             if(archive.get(n.first) != n.second)
             {
-                throw std::runtime_error("Strings do not match.");
+                throw std::runtime_error("Bytes do not match.");
             }
         }
     }
     CATCH
 
-    // Test 6: Deleting a file.
+    // Delete a file.
     try
     {
         paz::remove(appDir + "/" + ArchivePath);
