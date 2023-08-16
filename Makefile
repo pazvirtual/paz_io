@@ -14,7 +14,7 @@ else
     endif
     INCLPATH := /usr/local/include
 endif
-CXXVER := 14
+CXXVER := 17
 OPTIM := fast
 ZIPNAME := $(PROJNAME)-$(OSPRETTY)
 CFLAGS := -O$(OPTIM) -Wall -Wextra -Wno-missing-braces
@@ -33,7 +33,7 @@ ARFLAGS := -rcs
 
 CSRC := $(wildcard *.c) $(wildcard *.cpp)
 ifeq ($(OSPRETTY), macOS)
-    MACOSEXCL := gl_core_4_1.c $(patsubst %_metal.mm, %.cpp, $(wildcard *_metal.mm))
+    MACOSEXCL := gl_core_4_1.c $(patsubst %_macos.mm, %.cpp, $(wildcard *_macos.mm))
     CSRC := $(filter-out $(MACOSEXCL), $(CSRC))
 endif
 OBJCSRC := $(wildcard *.mm)
