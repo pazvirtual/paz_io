@@ -30,12 +30,18 @@ endif
 SRC := $(wildcard *.cpp)
 EXE := $(SRC:.cpp=)
 
+REINSTALL := $(shell cmp -s paz-archive $(BINPATH)/paz-archive; echo $$?)
+
 print-% : ; @echo $* = $($*)
 
 all: $(EXE)
 
+ifneq ($(REINSTALL), 0)
 install: paz-archive
 	cp paz-archive $(BINPATH)/
+else
+install: paz-archive
+endif
 
 %: %.cpp
 	$(CXX) -o $@ $< $(CXXFLAGS) $(INCL) $(LIBS)
