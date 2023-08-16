@@ -49,9 +49,10 @@ namespace paz
     template<typename T, int NumChannels>
     class Image : public std::vector<T>
     {
-        int _rows;
+        int _rows = 0;
 
     public:
+        Image() = default;
         Image(int width, int height) : std::vector<T>(width*height*NumChannels),
             _rows(height) {}
         Image(const T* data, int width, int height) : std::vector<T>(data, data
