@@ -3,11 +3,15 @@
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 
 namespace paz
 {
     void write_bmp(const std::string& path, unsigned int width, const std::
         vector<float>& rgb);
+
+    std::unordered_map<std::string, std::vector<float>> load_obj(const std::
+        string& path);
 }
 
 #endif
