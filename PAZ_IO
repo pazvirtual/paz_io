@@ -15,6 +15,11 @@ namespace paz
     template<typename T, typename U>
     using require_different = std::enable_if_t<!std::is_same<T, U>::value>;
 
+    template<typename T>
+    using require_iterable = std::enable_if_t<std::is_same<decltype(std::begin(
+        std::declval<const T&>())), decltype(std::end(std::declval<const
+        T&>()))>::value>;
+
     class Bytes : public std::vector<unsigned char>
     {
         using std::vector<unsigned char>::vector;
@@ -40,66 +45,45 @@ namespace paz
     };
 
     template<typename T, int NumChannels>
-    class Image
+    class Image : public std::vector<T>
     {
-        std::vector<T> _pixels;
         int _rows;
 
-        Image() {}
-
     public:
-        Image(int width, int height) : _pixels(width*height*NumChannels), _rows(
-            height) {}
-        Image(const T* data, int width, int height) : _pixels(data, data +
-            width*height*NumChannels), _rows(height) {}
-
-        T* data()
+        Image(int width, int height) : std::vector<T>(width*height*NumChannels),
+            _rows(height) {}
+        Image(const T* data, int width, int height) : std::vector<T>(data, data
+            + width*height*NumChannels), _rows(height) {}
+        Image(const std::vector<T>& data, int width, int height) : std::vector<
+            T>(data), _rows(height)
         {
-            return _pixels.data();
+            if(data.size() != width*height*NumChannels)
+            {
+                throw std::runtime_error("Image dimensions do not match.");
+            }
         }
-
-        const T* data() const
+        template<typename U, require_iterable<U>* = nullptr>
+        Image(const U& data, int width, int height) : std::vector<T>(&*std::
+            begin(data), std::distance(&*std::begin(data), &*std::end(data))),
+            _rows(height)
         {
-            return _pixels.data();
+            if(data.size() != width*height*NumChannels)
+            {
+                throw std::runtime_error("Image dimensions do not match.");
+            }
         }
+        template<typename U, require_different<T, U>* = nullptr>
+        explicit Image(const Image<U, NumChannels>& image) : std::vector<T>(
+            image.begin(), image.end()), _rows(image.height()) {}
 
         int width() const
         {
-            return _pixels.size()/NumChannels/_rows;
+            return std::vector<T>::size()/NumChannels/_rows;
         }
 
         int height() const
         {
             return _rows;
-        }
-
-        auto begin() const
-        {
-            return _pixels.begin();
-        }
-
-        auto end() const
-        {
-            return _pixels.end();
-        }
-
-        const T& operator[](std::size_t i) const
-        {
-            return _pixels[i];
-        }
-
-        template<typename U, require_same<T, U>* = nullptr>
-        const auto& cast() const
-        {
-            return *this;
-        }
-        template<typename U, require_different<T, U>* = nullptr>
-        auto cast() const
-        {
-            Image<U, NumChannels> image;
-            image._pixels = std::vector<U>(_pixels.begin(), _pixels.end());
-            image._rows = _rows;
-            return image;
         }
     };
 

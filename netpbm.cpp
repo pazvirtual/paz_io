@@ -25,7 +25,8 @@ paz::Image<std::uint8_t, 1> paz::load_pbm(const std::string& path)
     in >> height;
 
     // Get data.
-    std::vector<std::uint8_t> pixels(width*height, 0);
+    Image<std::uint8_t, 1> image(width, height);
+    std::fill(image.begin(), image.end(), 0);
     char c;
     unsigned int n = 0;
     while(in >> c && n < width*height)
@@ -34,7 +35,7 @@ paz::Image<std::uint8_t, 1> paz::load_pbm(const std::string& path)
         {
             unsigned int x = n%width;
             unsigned int y = n/width;
-            pixels[width*(height - 1 - y) + x] = 255;
+            image[width*(height - 1 - y) + x] = 255;
         }
         if(c == '0' || c == '1')
         {
@@ -48,5 +49,5 @@ paz::Image<std::uint8_t, 1> paz::load_pbm(const std::string& path)
         throw std::runtime_error("Number of pixels does not match dimensions.");
     }
 
-    return paz::Image<std::uint8_t, 1>(pixels.data(), width, height);
+    return image;
 }
