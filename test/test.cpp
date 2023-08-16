@@ -11,9 +11,19 @@ static const std::unordered_map<std::string, std::string> TestData =
 
 int main(int, char** argv)
 {
-    const std::string appDir = paz::split_path(argv[0])[0];
+    // Test 1: Splitting path to get working directory.
+    std::string appDir;
+    try
+    {
+        appDir = paz::split_path(argv[0])[0];
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << "Failed 1: " << e.what() << std::endl;
+    }
+    std::cout << "Passed 1" << std::endl;
 
-    // Test 1: Compressing and decompressing text.
+    // Test 2: Compressing and decompressing text.
     std::string res;
     try
     {
@@ -24,12 +34,12 @@ int main(int, char** argv)
     }
     catch(const std::exception& e)
     {
-        std::cerr << "Failed 1: " << e.what() << std::endl;
+        std::cerr << "Failed 2: " << e.what() << std::endl;
         return 1;
     }
-    std::cout << "Passed 1" << std::endl;
+    std::cout << "Passed 2" << std::endl;
 
-    // Test 2: Writing an archive.
+    // Test 3: Writing an archive.
     try
     {
         std::unordered_map<std::string, std::vector<unsigned char>> data;
@@ -41,12 +51,12 @@ int main(int, char** argv)
     }
     catch(const std::exception& e)
     {
-        std::cerr << "Failed 2: " << e.what() << std::endl;
+        std::cerr << "Failed 3: " << e.what() << std::endl;
         return 1;
     }
-    std::cout << "Passed 2" << std::endl;
+    std::cout << "Passed 3" << std::endl;
 
-    // Test 3: Loading an archive's contents list.
+    // Test 4: Loading an archive's contents list.
     try
     {
         const std::unordered_map<std::string, std::size_t> contents = paz::
@@ -65,12 +75,12 @@ int main(int, char** argv)
     }
     catch(const std::exception& e)
     {
-        std::cerr << "Failed 3: " << e.what() << std::endl;
+        std::cerr << "Failed 4: " << e.what() << std::endl;
         return 1;
     }
-    std::cout << "Passed 3" << std::endl;
+    std::cout << "Passed 4" << std::endl;
 
-    // Test 4: Loading data from an archive.
+    // Test 5: Loading data from an archive.
     try
     {
         for(const auto& n : TestData)
@@ -85,8 +95,8 @@ int main(int, char** argv)
     }
     catch(const std::exception& e)
     {
-        std::cerr << "Failed 4: " << e.what() << std::endl;
+        std::cerr << "Failed 5: " << e.what() << std::endl;
         return 1;
     }
-    std::cout << "Passed 4" << std::endl;
+    std::cout << "Passed 5" << std::endl;
 }

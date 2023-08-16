@@ -48,6 +48,8 @@ print-% : ; @echo $* = $($*)
 default: lib$(LIBNAME).a
 	make -C test
 	make -C util
+	test/test
+	$(RM) test/test-archive.paz
 
 lib$(LIBNAME).a: $(OBJ)
 	$(RM) lib$(LIBNAME).a

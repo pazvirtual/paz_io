@@ -3,5 +3,5 @@
 *.exe
 *.zip
 *.paz
-test/archive-test
+test/test
 util/paz-archive
