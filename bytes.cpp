@@ -26,7 +26,7 @@ std::string paz::Bytes::str() const
     return s;
 }
 
-paz::Bytes paz::load_file(const std::string& path)
+paz::Bytes paz::load_bytes(const std::string& path)
 {
     std::ifstream in(path, std::ios::binary);
     if(!in)
@@ -35,4 +35,15 @@ paz::Bytes paz::load_file(const std::string& path)
     }
     return Bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<
         char>());
+}
+
+void paz::write_bytes(const std::string& path, const Bytes& data)
+{
+    std::ofstream out(path, std::ios::binary);
+    if(!out)
+    {
+        throw std::runtime_error("Failed to open output file \"" + path + "\"."
+            );
+    }
+    std::copy(data.begin(), data.end(), std::ostreambuf_iterator<char>(out));
 }

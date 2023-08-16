@@ -23,15 +23,10 @@ static unsigned int get_dim(const paz::Bytes& content, std::size_t& idx)
     return dim;
 }
 
-void paz::write_pbm(const std::string& path, const Image<std::uint8_t, 1>& img)
+paz::Bytes paz::to_pbm(const Image<std::uint8_t, 1>& img)
 {
-    std::ofstream out(path, std::ios::binary);
-    if(!out)
-    {
-        throw std::runtime_error("Unable to open \"" + path + "\".");
-    }
-
-    out << "P4\n" << img.width() << " " << img.height() << "\n";
+    Bytes res("P4\n" + std::to_string(img.width()) + " " + std::to_string(img.
+        height()) + "\n");
     for(int i = 0; i < img.height(); ++i)
     {
         unsigned int rowStart = (img.height() - i - 1)*img.width();
@@ -46,16 +41,17 @@ void paz::write_pbm(const std::string& path, const Image<std::uint8_t, 1>& img)
             ++x;
             if(x == img.width())
             {
-                out.put(c);
+                res.push_back(c);
                 break;
             }
             if(!(x%8))
             {
-                out.put(c);
+                res.push_back(c);
                 c = 0;
             }
         }
     }
+    return res;
 }
 
 // Need to add support for comments.

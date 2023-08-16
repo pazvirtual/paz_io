@@ -103,7 +103,7 @@ paz::Bytes paz::uncompress(const Bytes& src)
     return buf;
 }
 
-paz::Archive::Archive(const std::string& path) : Archive(load_file(path)) {}
+paz::Archive::Archive(const std::string& path) : Archive(load_bytes(path)) {}
 
 paz::Archive::Archive(const Bytes& src)
 {

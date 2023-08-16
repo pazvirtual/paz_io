@@ -97,10 +97,10 @@ namespace paz
     std::array<std::string, 3> split_path(const std::string& path);
 
     Image<std::uint8_t, 1> parse_pbm(const Bytes& content);
-    void write_pbm(const std::string& path, const Image<std::uint8_t, 1>& img);
+    Bytes to_pbm(const Image<std::uint8_t, 1>& img);
 
     Image<std::uint8_t, 4> parse_bmp(const Bytes& content);
-    void write_bmp(const std::string& path, const Image<std::uint8_t, 4>& img);
+    Bytes to_bmp(const Image<std::uint8_t, 4>& img);
 
     // Positions and normals are padded for graphics compatibility ([vx, vy, vz,
     // 1] and [nx, ny, nz, 0]) and materials are one-indexed (0: unassigned, 1:
@@ -120,7 +120,8 @@ namespace paz
     Bytes compress(const Bytes& src);
     Bytes uncompress(const Bytes& src);
 
-    Bytes load_file(const std::string& path);
+    Bytes load_bytes(const std::string& path);
+    void write_bytes(const std::string& path, const Bytes& data);
 
     void remove(const std::string& path);
 }

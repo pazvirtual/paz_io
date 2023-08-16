@@ -12,7 +12,7 @@ paz::Image<std::uint8_t, 4> paz::parse_bmp(const Bytes& content)
     throw std::logic_error("NOT IMPLEMENTED");
 }
 
-void paz::write_bmp(const std::string& path, const Image<std::uint8_t, 4>& img)
+paz::Bytes paz::to_bmp(const Image<std::uint8_t, 4>& img)
 {
     unsigned int extraBytes = 4 - ((3*img.width())%4);
     if(extraBytes == 4)
@@ -25,33 +25,27 @@ void paz::write_bmp(const std::string& path, const Image<std::uint8_t, 4>& img)
         static_cast<unsigned int>(img.width()), static_cast<unsigned int>(img.
         height()), 0, 0, paddedSize, 0, 0, 0, 0};
 
-    std::ofstream out(path, std::ios::binary);
-    if(!out)
-    {
-        throw std::runtime_error("Unable to open \"" + path + "\".");
-    }
-
-    out << "BM";
+    Bytes res("BM");
 
     for(int i = 0; i < 6; ++i)
     {
-        out.put(headers[i]&0x000000ffu);
-        out.put((headers[i]&0x0000ff00u) >> 8);
-        out.put((headers[i]&0x00ff0000u) >> 16);
-        out.put((headers[i]&0xff000000u) >> 24);
+        res.push_back(headers[i]&0x000000ffu);
+        res.push_back((headers[i]&0x0000ff00u) >> 8);
+        res.push_back((headers[i]&0x00ff0000u) >> 16);
+        res.push_back((headers[i]&0xff000000u) >> 24);
     }
 
-    out.put(1);
-    out.put(0);
-    out.put(24);
-    out.put(0);
+    res.push_back(1);
+    res.push_back(0);
+    res.push_back(24);
+    res.push_back(0);
 
     for(int i = 7; i < 13; ++i)
     {
-        out.put(headers[i]&0x000000ffu);
-        out.put((headers[i]&0x0000ff00u) >> 8);
-        out.put((headers[i]&0x00ff0000u) >> 16);
-        out.put((headers[i]&0xff000000u) >> 24);
+        res.push_back(headers[i]&0x000000ffu);
+        res.push_back((headers[i]&0x0000ff00u) >> 8);
+        res.push_back((headers[i]&0x00ff0000u) >> 16);
+        res.push_back((headers[i]&0xff000000u) >> 24);
     }
 
     for(int y = 0; y < img.height(); ++y)
@@ -60,12 +54,14 @@ void paz::write_bmp(const std::string& path, const Image<std::uint8_t, 4>& img)
         {
             for(int i = 2; i >= 0; --i)
             {
-                out.put(img[4*(y*img.width() + x) + i]);
+                res.push_back(img[4*(y*img.width() + x) + i]);
             }
         }
         for(unsigned int i = 0; i < extraBytes; ++i)
         {
-            out.put(0);
+            res.push_back(0);
         }
     }
+
+    return res;
 }

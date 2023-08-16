@@ -126,8 +126,8 @@ int main(int, char** argv)
         {
             a[ImgRes*i + i] = 255;
         }
-        paz::write_pbm(appDir + "/" + PbmPath, a);
-        const paz::Image<std::uint8_t, 1> b = paz::parse_pbm(paz::load_file(
+        paz::write_bytes(appDir + "/" + PbmPath, paz::to_pbm(a));
+        const paz::Image<std::uint8_t, 1> b = paz::parse_pbm(paz::load_bytes(
             appDir + "/" + PbmPath));
         if(a != b)
         {
