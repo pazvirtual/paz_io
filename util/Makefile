@@ -20,7 +20,6 @@ else
     ifeq ($(OSPRETTY), Windows)
         CXXFLAGS += -Wno-deprecated-copy
     endif
-    CXXFLAGS += -pthread
 endif
 INCL := -I..
 LIBS := ../libpazio.a
