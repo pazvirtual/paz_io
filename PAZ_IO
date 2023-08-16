@@ -164,6 +164,14 @@ namespace paz
         unsigned int>>& materials, std::vector<std::string>& materialNames,
         std::vector<std::string>& materialLibs, std::vector<std::vector<unsigned
         int>>& indices);
+    void parse_model(const Bytes& content, std::vector<float>& positions, std::
+        vector<float>& uvs, std::vector<float>& normals, std::vector<unsigned
+        int>& materials, std::vector<std::string>& materialNames, std::vector<
+        std::string>& materialLibs, std::vector<unsigned int>& indices);
+    Bytes to_model(std::vector<float>& positions, std::vector<float>& uvs, std::
+        vector<float>& normals, std::vector<unsigned int>& materials, std::
+        vector<std::string>& materialNames, std::vector<std::string>&
+        materialLibs, std::vector<unsigned int>& indices);
 
     Bytes compress(const Bytes& src);
     Bytes uncompress(const Bytes& src);
