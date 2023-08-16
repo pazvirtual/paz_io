@@ -13,7 +13,7 @@
 
 static const std::string ArchivePath = "test-archive.paz";
 static const std::string TestString = "Abcdefg.";
-static const std::unordered_map<std::string, std::string> TestData =
+static const std::unordered_map<std::string, paz::Bytes> TestData =
 {
     {"file1.ext", "content content\ncontent content"},
     {"file2.whatever", "other stuff"}
@@ -45,42 +45,22 @@ int main(int, char** argv)
     // Test 3: Writing an archive.
     try
     {
-        std::unordered_map<std::string, paz::Bytes> data;
+        paz::Archive archive;
         for(const auto& n : TestData)
         {
-            data[n.first] = paz::compress(n.second);
+            archive.add(n.first, n.second);
         }
-        paz::write_archive(appDir + "/" + ArchivePath, data);
+        archive.write(appDir + "/" + ArchivePath);
     }
     CATCH
 
-    // Test 4: Loading an archive's contents list.
+    // Test 4: Loading an archive.
     try
     {
-        const std::unordered_map<std::string, std::size_t> contents = paz::
-            load_contents_list(appDir + "/" + ArchivePath);
-        if(contents.size() != TestData.size())
-        {
-            throw std::runtime_error("Number of blocks does not match.");
-        }
-        for(const auto& n : contents)
-        {
-            if(!TestData.count(n.first))
-            {
-                throw std::runtime_error("Block names do not match.");
-            }
-        }
-    }
-    CATCH
-
-    // Test 5: Loading data from an archive.
-    try
-    {
+        const paz::Archive archive(appDir + "/" + ArchivePath);
         for(const auto& n : TestData)
         {
-            const std::string data = paz::load_block(appDir + "/" + ArchivePath,
-                n.first);
-            if(data != n.second)
+            if(archive.get(n.first) != n.second)
             {
                 throw std::runtime_error("Strings do not match.");
             }

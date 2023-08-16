@@ -64,15 +64,14 @@ int main(int argc, char** argv)
     }
 
     // Compress input files.
-    std::unordered_map<std::string, paz::Bytes> blocks;
+    paz::Archive archive;
     for(const auto& n : files)
     {
-        blocks[n] = paz::compress(paz::load_text(isDir ? dirPath + "/" + n :
-            n));
+        archive.add(n, paz::load_text(isDir ? dirPath + "/" + n : n));
     }
 
     // Create archive.
     const std::string outPath = (isDir && argc < 3) ? dirPath + ".paz" : argv[
         argc - 1];
-    paz::write_archive(outPath, blocks);
+    archive.write(outPath);
 }

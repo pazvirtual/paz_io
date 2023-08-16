@@ -18,6 +18,20 @@ namespace paz
         std::string str() const;
     };
 
+    class Archive
+    {
+        std::unordered_map<std::string, Bytes> _blocks;
+
+    public:
+        Archive();
+        Archive(const std::string& path);
+        void add(const std::string& name, const Bytes& data);
+        Bytes get(const std::string& name) const;
+        void load(const std::string& path);
+        void write(const std::string& path) const;
+        void clear();
+    };
+
     std::array<std::string, 3> split_path(const std::string& path);
 
     void write_bmp(const std::string& path, unsigned int width, const std::
@@ -40,11 +54,6 @@ namespace paz
 
     Bytes compress(const Bytes& src);
     Bytes uncompress(const Bytes& src);
-    void write_archive(const std::string& path, const std::unordered_map<std::
-        string, Bytes>& blocks);
-    std::unordered_map<std::string, std::size_t> load_contents_list(const std::
-        string& path);
-    std::string load_block(const std::string& path, const std::string& name);
 
     std::string load_text(const std::string& path);
 

@@ -2,6 +2,7 @@
 #include "miniz.h"
 #include <fstream>
 #include <sstream>
+#include <map>
 
 #ifdef compress
 #undef compress
@@ -100,13 +101,94 @@ paz::Bytes paz::uncompress(const Bytes& src)
     return buf;
 }
 
-void paz::write_archive(const std::string& path, const std::unordered_map<std::
-    string, Bytes>& blocks)
+paz::Archive::Archive() {}
+
+paz::Archive::Archive(const std::string& path)
+{
+    load(path);
+}
+
+void paz::Archive::add(const std::string& name, const Bytes& data)
+{
+    if(_blocks.count(name))
+    {
+        throw std::runtime_error("Archive already contains block \"" + name +
+            "\".");
+    }
+
+    _blocks[name] = compress(data);
+}
+
+paz::Bytes paz::Archive::get(const std::string& name) const
+{
+    if(!_blocks.count(name))
+    {
+        throw std::runtime_error("Archive does not contain block \"" + name +
+            "\".");
+    }
+
+    return uncompress(_blocks.at(name));
+}
+
+void paz::Archive::load(const std::string& path)
+{
+    // Open input file.
+    std::ifstream file(path, std::ios::binary);
+    if(!file)
+    {
+        throw std::runtime_error("Failed to open input file \"" + path + "\".");
+    }
+
+    // Extract input data and close file.
+    const Bytes src((std::istreambuf_iterator<char>(file)), std::
+        istreambuf_iterator<char>());
+    file.close();
+    if(src.empty())
+    {
+        throw std::runtime_error("Archive \"" + path + "\" is empty.");
+    }
+
+    // Get contents list.
+    unsigned long dataStart = 0;
+    for(unsigned long i = 0; i < 4; ++i)
+    {
+        dataStart |= (unsigned long)src[i] << 8*i;
+    }
+    std::stringstream ss(paz::uncompress(Bytes(src.begin() + 4, src.begin() + 4
+        + dataStart)).str());
+    std::map<std::size_t, std::string> contents;
+    std::string line;
+    while(std::getline(ss, line))
+    {
+        std::stringstream lineSs(line);
+        std::string name;
+        std::getline(lineSs, name, ' ');
+        std::string str;
+        std::getline(lineSs, str);
+        contents[4 + dataStart + std::stoull(str)] = name;
+    }
+
+    // Get compressed blocks.
+    for(auto it = contents.begin(); it != contents.end(); ++it)
+    {
+        if(_blocks.count(it->second))
+        {
+            throw std::runtime_error("Archive already contains block \"" + it->
+                second + "\".");
+        }
+        auto next = it;
+        ++next;
+        _blocks.try_emplace(it->second, src.begin() + it->first, next ==
+            contents.end() ? src.end() : src.begin() + next->first);
+    }
+}
+
+void paz::Archive::write(const std::string& path) const
 {
     // Construct contents list.
     std::ostringstream contents;
     std::size_t curOutByte = 0;
-    for(const auto& n : blocks)
+    for(const auto& n : _blocks)
     {
         if(n.first.empty())
         {
@@ -134,109 +216,13 @@ void paz::write_archive(const std::string& path, const std::unordered_map<std::
     out.write((char*)buf.data(), buf.size());
 
     // Write blocks to file.
-    for(const auto& n : blocks)
+    for(const auto& n : _blocks)
     {
         out.write((char*)n.second.data(), n.second.size());
     }
 }
 
-std::unordered_map<std::string, std::size_t> paz::load_contents_list(const std::
-    string& path)
+void paz::Archive::clear()
 {
-    // Open input file.
-    std::ifstream file(path, std::ios::binary);
-    if(!file)
-    {
-        throw std::runtime_error("Failed to open input file \"" + std::string(
-            path) + "\".");
-    }
-
-    // Extract input data and close file.
-    const Bytes src((std::istreambuf_iterator<char>(file)), std::
-        istreambuf_iterator<char>());
-    file.close();
-    if(src.empty())
-    {
-        throw std::runtime_error("Archive \"" + std::string(path) + "\" is empt"
-            "y.");
-    }
-
-    // Get contents list.
-    unsigned long dataStart = 0;
-    for(unsigned long i = 0; i < 4; ++i)
-    {
-        dataStart |= (unsigned long)src[i] << 8*i;
-    }
-    std::stringstream ss(paz::uncompress(Bytes(src.begin() + 4, src.begin() + 4
-        + dataStart)).str());
-    std::unordered_map<std::string, std::size_t> contents;
-    std::string line;
-    while(std::getline(ss, line))
-    {
-        std::stringstream lineSs(line);
-        std::string name;
-        std::getline(lineSs, name, ' ');
-        std::string str;
-        std::getline(lineSs, str);
-        contents[name] = 4 + dataStart + std::stoull(str);
-    }
-
-    return contents;
-}
-
-std::string paz::load_block(const std::string& path, const std::string& name)
-{
-    // Open input file.
-    std::ifstream file(path, std::ios::binary);
-    if(!file)
-    {
-        throw std::runtime_error("Unable to open input file \"" + std::string(
-            path) + "\".");
-    }
-
-    // Extract input data and close file.
-    const Bytes src((std::istreambuf_iterator<char>(file)), std::
-        istreambuf_iterator<char>());
-    file.close();
-    if(src.empty())
-    {
-        throw std::runtime_error("Archive \"" + path + "\" is empty.");
-    }
-
-    // Find the desired block.
-    unsigned long dataStart = 0;
-    for(unsigned long i = 0; i < 4; ++i)
-    {
-        dataStart |= (unsigned long)src[i] << 8*i;
-    }
-    std::stringstream ss(paz::uncompress(Bytes(src.begin() + 4, src.begin() + 4
-        + dataStart)).str());
-    std::string line;
-    std::size_t start = 0;
-    std::size_t end = src.size();
-    while(std::getline(ss, line))
-    {
-        std::stringstream lineSs(line);
-        std::string curName;
-        std::getline(lineSs, curName, ' ');
-        std::string str;
-        std::getline(lineSs, str);
-        const std::size_t s = std::stoull(str);
-        if(start)
-        {
-            end = 4 + dataStart + s;
-            break;
-        }
-        else if(curName == name)
-        {
-            start = 4 + dataStart + s;
-        }
-    }
-    if(!start)
-    {
-        throw std::runtime_error("Archive \"" + path + "\" does not contain blo"
-            "ck \"" + name + "\".");
-    }
-
-    return uncompress(Bytes(src.begin() + start, src.begin() + end)).str();
+    _blocks.clear();
 }
