@@ -14,7 +14,7 @@ else
     INCLPATH := /usr/local/include
 endif
 CXXVER := 17
-OPTIM := fast
+OPTIM := 3
 ZIPNAME := $(PROJNAME)-$(OSPRETTY)
 ifeq ($(OSPRETTY), Windows)
     ZIPCONTENTS := $(PROJNAME) lib$(LIBNAME).a util/paz-archive.exe

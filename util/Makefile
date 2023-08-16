@@ -12,7 +12,7 @@ else
     BINPATH := /usr/local/bin
 endif
 CXXVER := 14
-OPTIM := fast
+OPTIM := 3
 CXXFLAGS := -std=c++$(CXXVER) -O$(OPTIM) -Wall -Wextra -Wno-missing-braces -Wold-style-cast
 ifeq ($(OSPRETTY), macOS)
     CXXFLAGS += -mmacosx-version-min=10.11 -Wunguarded-availability
