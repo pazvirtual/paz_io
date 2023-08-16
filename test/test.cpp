@@ -121,15 +121,15 @@ int main(int, char** argv)
     // Write, read, and delete a binary PBM file.
     try
     {
-        paz::Image<std::uint8_t, 1> a(ImgRes, ImgRes);
+        paz::Image a(paz::ImageFormat::R8UNorm, ImgRes, ImgRes);
         for(int i = 0; i < ImgRes; ++i)
         {
-            a[ImgRes*i + i] = 255;
+            a.bytes()[ImgRes*i + i] = 255;
         }
         paz::write_bytes(appDir + "/" + PbmPath, paz::to_pbm(a));
-        const paz::Image<std::uint8_t, 1> b = paz::parse_pbm(paz::read_bytes(
-            appDir + "/" + PbmPath));
-        if(a != b)
+        const paz::Image b = paz::parse_pbm(paz::read_bytes(appDir + "/" +
+            PbmPath));
+        if(a.bytes() != b.bytes())
         {
             throw std::runtime_error("Images do not match.");
         }

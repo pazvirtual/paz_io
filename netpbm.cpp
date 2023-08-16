@@ -47,8 +47,13 @@ static unsigned int get_dim(const paz::Bytes& content, std::size_t& idx)
     return dim;
 }
 
-paz::Bytes paz::to_pbm(const Image<std::uint8_t, 1>& img)
+paz::Bytes paz::to_pbm(const Image& img)
 {
+    if(img.format() != ImageFormat::R8UNorm)
+    {
+        throw std::runtime_error("Image format must be R8UNorm.");
+    }
+
     Bytes res("P4\n" + std::to_string(img.width()) + " " + std::to_string(img.
         height()) + "\n");
     for(int i = 0; i < img.height(); ++i)
@@ -58,7 +63,7 @@ paz::Bytes paz::to_pbm(const Image<std::uint8_t, 1>& img)
         unsigned char c = 0;
         while(true)
         {
-            if(img[rowStart + x] < 128)
+            if(img.bytes()[rowStart + x] < 128)
             {
                 c |= 1 << (7 - x%8);
             }
@@ -79,7 +84,7 @@ paz::Bytes paz::to_pbm(const Image<std::uint8_t, 1>& img)
 }
 
 // Need to add support for comments.
-paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
+paz::Image paz::parse_pbm(const Bytes& content)
 {
     // Check format.
     if(content[0] != 'P' || !(content[1] == '1' || content[1] == '4'))
@@ -97,8 +102,8 @@ paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
     skip(content, idx);
 
     // Get data.
-    Image<std::uint8_t, 1> image(width, height);
-    std::fill(image.begin(), image.end(), 0);
+    Image res(ImageFormat::R8UNorm, width, height);
+    std::fill(res.bytes().begin(), res.bytes().end(), 0);
     unsigned int n = 0;
     if(isBinary)
     {
@@ -109,7 +114,8 @@ paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
             {
                 const unsigned int x = n%width;
                 const unsigned int y = n/width;
-                image[width*(height - 1 - y) + x] = !((b >> (7 - i))&1)*255;
+                res.bytes()[width*(height - 1 - y) + x] = !((b >> (7 - i))&1)*
+                    255;
                 ++n;
                 if(n == width*(y + 1))
                 {
@@ -127,7 +133,7 @@ paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
             {
                 const unsigned int x = n%width;
                 const unsigned int y = n/width;
-                image[width*(height - 1 - y) + x] = 255;
+                res.bytes()[width*(height - 1 - y) + x] = 255;
             }
             if(c == '0' || c == '1')
             {
@@ -143,5 +149,5 @@ paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
             "d at least " + std::to_string(width*height) + ".");
     }
 
-    return image;
+    return res;
 }

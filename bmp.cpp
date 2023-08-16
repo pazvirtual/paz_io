@@ -3,7 +3,7 @@
 #include <fstream>
 #include <cmath>
 
-paz::Image<std::uint8_t, 4> paz::parse_bmp(const Bytes& content)
+paz::Image paz::parse_bmp(const Bytes& content)
 {
     std::string fmt;
     if(content.size() > 1)
@@ -45,7 +45,7 @@ paz::Image<std::uint8_t, 4> paz::parse_bmp(const Bytes& content)
         height |= content[22 + i] << 8*i;
     }
     //TEMP - need to check compression method, color depth, and palette
-    Image<std::uint8_t, 4> res(width, height);
+    Image res(ImageFormat::RGBA8UNorm_sRGB, width, height);
     unsigned int extraBytes = 4 - ((3*width)%4);
     if(extraBytes == 4)
     {
@@ -57,17 +57,22 @@ paz::Image<std::uint8_t, 4> paz::parse_bmp(const Bytes& content)
         {
             for(int k = 0; k < 3; ++k)
             {
-                res[4*(width*i + j) + k] = content[start + (3*width +
+                res.bytes()[4*(width*i + j) + k] = content[start + (3*width +
                     extraBytes)*i + 3*j + 2 - k];
             }
-            res[4*(width*i + j) + 3] = 255;
+            res.bytes()[4*(width*i + j) + 3] = 255;
         }
     }
     return res;
 }
 
-paz::Bytes paz::to_bmp(const Image<std::uint8_t, 4>& img)
+paz::Bytes paz::to_bmp(const Image& img)
 {
+    if(img.format() != ImageFormat::RGBA8UNorm_sRGB)
+    {
+        throw std::runtime_error("Image format must be RGBA8UNorm_sRGB.");
+    }
+
     unsigned int extraBytes = 4 - ((3*img.width())%4);
     if(extraBytes == 4)
     {
@@ -110,8 +115,8 @@ paz::Bytes paz::to_bmp(const Image<std::uint8_t, 4>& img)
         {
             for(int i = 0; i < 3; ++i)
             {
-                res[54 + (3*img.width() + extraBytes)*y + 3*x + i] = img[4*(y*
-                    img.width() + x) + 2 - i];
+                res[54 + (3*img.width() + extraBytes)*y + 3*x + i] = img.
+                    bytes()[4*(y*img.width() + x) + 2 - i];
             }
         }
         for(unsigned int i = 0; i < extraBytes; ++i)
