@@ -14,7 +14,8 @@ namespace paz
         vector<float>& rgb);
 
     // Positions and normals are padded for graphics compatibility ([vx, vy, vz,
-    // 1] and [nx, ny, nz, 0]) and materials are one-indexed.
+    // 1] and [nx, ny, nz, 0]) and materials are one-indexed (0: unassigned, 1:
+    // `materialNames[0]`, etc.).
     void load_obj(const std::string& path, std::vector<std::string>& names,
         std::vector<std::vector<float>>& positions, std::vector<std::vector<
         float>>& uvs, std::vector<std::vector<float>>& normals, std::vector<
