@@ -73,4 +73,15 @@ int main(int, char** argv)
         paz::remove(appDir + "/" + ArchivePath);
     }
     CATCH
+
+    // Check line ending conversion.
+    try
+    {
+        paz::Bytes temp("\n\r0\r\n1\r2\r\r");
+        if(temp.str() != "\n\n0\n1\n2\n\n")
+        {
+           throw std::runtime_error("Line ending conversion failed.");
+        }
+    }
+    CATCH
 }
