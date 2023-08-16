@@ -1,5 +1,5 @@
 PROJNAME := PAZ_IO
-LIBNAME := $(shell echo $(PROJNAME) | sed 's/_//g' | tr '[:upper:]' '[:lower:]') 
+LIBNAME := $(shell echo $(PROJNAME) | sed 's/_//g' | tr '[:upper:]' '[:lower:]')
 ifeq ($(OS), Windows_NT)
     LIBPATH := /mingw64/lib
     INCLPATH := /mingw64/include
