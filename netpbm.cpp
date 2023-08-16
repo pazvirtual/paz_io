@@ -1,35 +1,29 @@
 #include "PAZ_IO"
-#include <fstream>
+#include <sstream>
 
 // Need to add support for comments and binary (`P4`) PBMs.
-paz::Image<std::uint8_t, 1> paz::load_pbm(const std::string& path)
+paz::Image<std::uint8_t, 1> paz::parse_pbm(const Bytes& content)
 {
-    std::ifstream in(path);
-    if(!in)
+    // Check format.
+    if(content[0] != 'P' || content[1] != '1')
     {
-        throw std::runtime_error("Failed to open input file \"" + path + "\".");
+        throw std::runtime_error("This is not a plain PBM.");
     }
 
-    // Check format.
-    char c0, c1;
-    in >> c0;
-    in >> c1;
-    if(c0 != 'P' || c1 != '1')
-    {
-        throw std::runtime_error("This is not a plain PBM file.");
-    }
+    // Create input stream.
+    std::istringstream iss(content.str().substr(2));
 
     // Get dimensions.
     unsigned int width, height;
-    in >> width;
-    in >> height;
+    iss >> width;
+    iss >> height;
 
     // Get data.
     Image<std::uint8_t, 1> image(width, height);
     std::fill(image.begin(), image.end(), 0);
     char c;
     unsigned int n = 0;
-    while(in >> c && n < width*height)
+    while(iss >> c && n < width*height)
     {
         if(c == '0')
         {

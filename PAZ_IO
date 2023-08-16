@@ -90,24 +90,24 @@ namespace paz
 
     std::array<std::string, 3> split_path(const std::string& path);
 
-    Image<std::uint8_t, 1> load_pbm(const std::string& path);
+    Image<std::uint8_t, 1> parse_pbm(const Bytes& content);
 
     void write_bmp(const std::string& path, const Image<std::uint8_t, 3>& img);
 
     // Positions and normals are padded for graphics compatibility ([vx, vy, vz,
     // 1] and [nx, ny, nz, 0]) and materials are one-indexed (0: unassigned, 1:
     // `materialNames[0]`, etc.).
-    void load_obj(const std::string& path, std::vector<std::string>& names,
-        std::vector<std::vector<float>>& positions, std::vector<std::vector<
-        float>>& uvs, std::vector<std::vector<float>>& normals, std::vector<
-        std::vector<unsigned int>>& materials, std::vector<std::string>&
-        materialNames, std::vector<std::string>& materialLibs);
-    void load_obj(const std::string& path, std::vector<std::string>& names,
-        std::vector<std::vector<float>>& positions, std::vector<std::vector<
-        float>>& uvs, std::vector<std::vector<float>>& normals, std::vector<
-        std::vector<unsigned int>>& materials, std::vector<std::string>&
-        materialNames, std::vector<std::string>& materialLibs, std::vector<std::
-        vector<unsigned int>>& indices);
+    void parse_obj(const Bytes& content, std::vector<std::string>& names, std::
+        vector<std::vector<float>>& positions, std::vector<std::vector<float>>&
+        uvs, std::vector<std::vector<float>>& normals, std::vector<std::vector<
+        unsigned int>>& materials, std::vector<std::string>& materialNames,
+        std::vector<std::string>& materialLibs);
+    void parse_obj(const Bytes& content, std::vector<std::string>& names, std::
+        vector<std::vector<float>>& positions, std::vector<std::vector<float>>&
+        uvs, std::vector<std::vector<float>>& normals, std::vector<std::vector<
+        unsigned int>>& materials, std::vector<std::string>& materialNames,
+        std::vector<std::string>& materialLibs, std::vector<std::vector<unsigned
+        int>>& indices);
 
     Bytes compress(const Bytes& src);
     Bytes uncompress(const Bytes& src);

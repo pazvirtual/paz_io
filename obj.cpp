@@ -1,5 +1,4 @@
 #include "PAZ_IO"
-#include <fstream>
 #include <sstream>
 #include <numeric>
 #include <algorithm>
@@ -18,17 +17,13 @@ static std::size_t find_vertex(float x, float y, float z, std::vector<float>& v,
     return v.size();
 }
 
-void paz::load_obj(const std::string& path, std::vector<std::string>& names,
-    std::vector<std::vector<float>>& positions, std::vector<std::vector<float>>&
-    uvs, std::vector<std::vector<float>>& normals, std::vector<std::vector<
-    unsigned int>>& materials, std::vector<std::string>& materialNames, std::
-    vector<std::string>& materialLibs)
+void paz::parse_obj(const Bytes& content, std::vector<std::string>& names, std::
+    vector<std::vector<float>>& positions, std::vector<std::vector<float>>& uvs,
+    std::vector<std::vector<float>>& normals, std::vector<std::vector<unsigned
+    int>>& materials, std::vector<std::string>& materialNames, std::vector<std::
+    string>& materialLibs)
 {
-    std::ifstream in(path);
-    if(!in)
-    {
-        throw std::runtime_error("Unable to open \"" + path + "\".");
-    }
+    std::istringstream iss(content.str());
 
     names.clear();
     positions.clear();
@@ -48,7 +43,7 @@ void paz::load_obj(const std::string& path, std::vector<std::string>& names,
     std::size_t numUvs = 0;
     std::size_t numNormals = 0;
     std::string line;
-    while(std::getline(in, line))
+    while(std::getline(iss, line))
     {
         if(line.substr(0, 7) == "mtllib ")
         {
@@ -191,14 +186,13 @@ void paz::load_obj(const std::string& path, std::vector<std::string>& names,
     }
 }
 
-void paz::load_obj(const std::string& path, std::vector<std::string>& names,
-    std::vector<std::vector<float>>& positions, std::vector<std::vector<float>>&
-    uvs, std::vector<std::vector<float>>& normals, std::vector<std::vector<
-    unsigned int>>& materials, std::vector<std::string>& materialNames, std::
-    vector<std::string>& materialLibs, std::vector<std::vector<unsigned int>>&
-    indices)
+void paz::parse_obj(const Bytes& content, std::vector<std::string>& names, std::
+    vector<std::vector<float>>& positions, std::vector<std::vector<float>>& uvs,
+    std::vector<std::vector<float>>& normals, std::vector<std::vector<unsigned
+    int>>& materials, std::vector<std::string>& materialNames, std::vector<std::
+    string>& materialLibs, std::vector<std::vector<unsigned int>>& indices)
 {
-    load_obj(path, names, positions, uvs, normals, materials, materialNames,
+    parse_obj(content, names, positions, uvs, normals, materials, materialNames,
         materialLibs);
 
     // Remove duplicates and set indices.
