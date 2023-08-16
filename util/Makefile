@@ -26,6 +26,10 @@ CXXFLAGS += -I..
 LDLIBS := ../libpazio.a
 ifeq ($(OSPRETTY), macOS)
     LDLIBS += -framework Cocoa
+else
+    ifeq ($(OSPRETTY), Windows)
+        LDFLAGS += -static-libgcc -static-libstdc++
+    endif
 endif
 
 SRC := $(wildcard *.cpp)
@@ -40,8 +44,8 @@ install: paz-archive
 
 ifeq ($(OSPRETTY), macOS)
 %: %.cpp
-	$(CXX) -arch arm64 -o $@_arm64 $< $(CXXFLAGS) $(INCL) $(LDLIBS)
-	$(CXX) -arch x86_64 -o $@_x86_64 $< $(CXXFLAGS) $(INCL) $(LDLIBS)
+	$(CXX) -arch arm64 -o $@_arm64 $< $(CXXFLAGS) $(INCL) $(LDFLAGS) $(LDLIBS)
+	$(CXX) -arch x86_64 -o $@_x86_64 $< $(CXXFLAGS) $(INCL) $(LDFLAGS) $(LDLIBS)
 	lipo -create -output $@ $@_arm64 $@_x86_64
 endif
 
