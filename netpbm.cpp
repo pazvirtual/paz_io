@@ -1,6 +1,7 @@
 #include "PAZ_IO"
 #include <sstream>
 #include <fstream>
+#include <cstdint>
 
 static void skip(const paz::Bytes& content, std::size_t& idx)
 {
