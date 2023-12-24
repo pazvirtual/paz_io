@@ -1,4 +1,5 @@
 #include "PAZ_IO"
+#include <iostream>
 #include <fstream>
 
 #define CATCH \
