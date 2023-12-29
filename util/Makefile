@@ -37,6 +37,8 @@ EXE := $(SRC:.cpp=)
 
 print-% : ; @echo $* = $($*)
 
+.PHONY: $(SRC)
+
 all: $(EXE)
 
 install: paz-archive
