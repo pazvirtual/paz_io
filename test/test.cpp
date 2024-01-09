@@ -78,7 +78,8 @@ int main(int, char** argv)
     // Load an archive.
     try
     {
-        const paz::Archive archive(appDir + "/" + ArchivePath);
+        paz::Archive archive;
+        archive.read(appDir + "/" + ArchivePath);
         const auto contents = archive.contents();
         if(archive.contents().size() != TestData.size())
         {

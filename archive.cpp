@@ -103,8 +103,6 @@ paz::Bytes paz::uncompress(const Bytes& src)
     return buf;
 }
 
-paz::Archive::Archive(const std::string& path) : Archive(read_bytes(path)) {}
-
 paz::Archive::Archive(const Bytes& src)
 {
     if(src.size() < 7 || src[0] != 'P' || src[1] != 'A' || src[2] != 'Z')
@@ -167,6 +165,11 @@ paz::Bytes paz::Archive::get(const std::string& name) const
     }
 
     return uncompress(_blocks.at(name));
+}
+
+void paz::Archive::read(const std::string& path)
+{
+    *this = Archive(read_bytes(path));
 }
 
 void paz::Archive::write(const std::string& path) const
