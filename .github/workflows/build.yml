@@ -15,15 +15,27 @@ jobs:
           install: make mingw-w64-x86_64-gcc
       - name: Build and Test
         run: make -j
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-libpazio.a
+          path: libpazio.a
   macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Build and Test
         run: make -j
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-libpazio.a
+          path: libpazio.a
   linux:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Build and Test
         run: make -j
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-libpazio.a
+          path: libpazio.a
