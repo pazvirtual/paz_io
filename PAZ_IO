@@ -10,11 +10,6 @@
 
 namespace paz
 {
-    template<typename T>
-    using require_iterable = std::enable_if_t<std::is_same<decltype(std::begin(
-        std::declval<const T&>())), decltype(std::end(std::declval<const
-        T&>()))>::value>;
-
     class Bytes : public std::vector<unsigned char>
     {
         using std::vector<unsigned char>::vector;
