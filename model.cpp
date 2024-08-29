@@ -70,10 +70,10 @@ void paz::parse_model(const Bytes& content, std::vector<float>& positions, std::
     }
 }
 
-paz::Bytes paz::to_model(std::vector<float>& positions, std::vector<float>& uvs,
-    std::vector<float>& normals, std::vector<unsigned int>& materials, std::
-    vector<std::string>& materialNames, std::vector<std::string>& materialLibs,
-    std::vector<unsigned int>& indices)
+paz::Bytes paz::to_model(const std::vector<float>& positions, const std::vector<
+    float>& uvs, const std::vector<float>& normals, const std::vector<unsigned
+    int>& materials, const std::vector<std::string>& materialNames, const std::
+    vector<std::string>& materialLibs, const std::vector<unsigned int>& indices)
 {
     std::ostringstream oss;
     oss << materials.size() << '\n';

@@ -163,10 +163,11 @@ namespace paz
         vector<float>& uvs, std::vector<float>& normals, std::vector<unsigned
         int>& materials, std::vector<std::string>& materialNames, std::vector<
         std::string>& materialLibs, std::vector<unsigned int>& indices);
-    Bytes to_model(std::vector<float>& positions, std::vector<float>& uvs, std::
-        vector<float>& normals, std::vector<unsigned int>& materials, std::
-        vector<std::string>& materialNames, std::vector<std::string>&
-        materialLibs, std::vector<unsigned int>& indices);
+    Bytes to_model(const std::vector<float>& positions, const std::vector<
+        float>& uvs, const std::vector<float>& normals, const std::vector<
+        unsigned int>& materials, const std::vector<std::string>& materialNames,
+        const std::vector<std::string>& materialLibs, const std::vector<unsigned
+        int>& indices);
 
     Bytes compress(const Bytes& src);
     Bytes uncompress(const Bytes& src);
