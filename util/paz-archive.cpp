@@ -12,7 +12,7 @@ Usage:
     paz-archive [options] <directory> [output path = <directory>.pazarchive]
 
 Options:
-    -c/--convert: Convert each OBJ object into a PAZ model
+    -c, --convert: Convert each OBJ object into a PAZ model
 )===";
 
 int main(int argc, char** argv)

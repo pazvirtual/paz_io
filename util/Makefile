@@ -2,40 +2,56 @@ CXXVER := 17
 MINMACOSVER := 10.12
 
 ifeq ($(OS), Windows_NT)
-    LIBPATH := /mingw64/lib
     OSPRETTY := Windows
-    BINPATH := /mingw64/bin
+    ifeq ($(MSYSTEM), UCRT64)
+        CC := gcc
+        CXX := g++
+        LIBPATH := /ucrt64/lib
+        BINPATH := /ucrt64/bin
+    else ifeq ($(MSYSTEM), CLANG64)
+        CC := clang
+        CXX := clang++
+        LIBPATH := /clang64/lib
+        BINPATH := /clang64/bin
+    else
+        $(error Unsupported Windows environment)
+    endif
 else
     ifeq ($(shell uname -s), Darwin)
         OSPRETTY := macOS
+        CC := clang
+        CXX := clang++
     else
         OSPRETTY := Linux
+        CC := gcc
+        CXX := g++
     endif
     LIBPATH := /usr/local/lib
     BINPATH := /usr/local/bin
 endif
 CXXFLAGS := -std=c++$(CXXVER) -O3 -Wall -Wextra -Wno-missing-braces -Wold-style-cast
 ifeq ($(OSPRETTY), macOS)
-    CXXFLAGS += -mmacosx-version-min=$(MINMACOSVER) -Wunguarded-availability -Wno-string-plus-int
-else
-    ifeq ($(OSPRETTY), Windows)
-        CXXFLAGS += -Wno-deprecated-copy -static
-    endif
+    CXXFLAGS += -mmacosx-version-min=$(MINMACOSVER) -Wunguarded-availability
+endif
+ifeq ($(CC), clang)
+    CXXFLAGS += -Wno-string-plus-int
 endif
 CXXFLAGS += -I..
 LDLIBS := ../libpazio.a
 ifeq ($(OSPRETTY), macOS)
     LDLIBS += -framework Cocoa
-else
-    ifeq ($(OSPRETTY), Windows)
-        LDFLAGS += -static-libgcc -static-libstdc++
+else ifeq ($(OSPRETTY), Windows)
+    ifeq ($(CC), gcc)
+        LDLIBS += -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic
+    else
+        LDLIBS += -Wl,-Bstatic -lc++ -Wl,-Bdynamic
     endif
 endif
 
 SRC := $(wildcard *.cpp)
 EXE := $(SRC:.cpp=)
 
-print-% : ; @echo $* = $($*)
+print-% : ; @echo "$* = $($*)"
 
 .PHONY: $(SRC)
 
