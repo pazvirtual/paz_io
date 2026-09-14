@@ -26,7 +26,8 @@ else
     endif
     LIBPATH := /usr/local/lib
 endif
-CXXFLAGS := -std=c++$(CXXVER) -O3 -Wall -Wextra -Wno-missing-braces -Wold-style-cast
+CXXFLAGS := -std=c++$(CXXVER) -O3 -Wall -Wextra -Wno-missing-braces \
+    -Wold-style-cast
 ifeq ($(OSPRETTY), macOS)
     CXXFLAGS += -mmacosx-version-min=$(MINMACOSVER) -Wunguarded-availability
 endif

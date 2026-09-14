@@ -29,7 +29,8 @@ else
     LIBPATH := /usr/local/lib
     BINPATH := /usr/local/bin
 endif
-CXXFLAGS := -std=c++$(CXXVER) -O3 -Wall -Wextra -Wno-missing-braces -Wold-style-cast
+CXXFLAGS := -std=c++$(CXXVER) -O3 -Wall -Wextra -Wno-missing-braces \
+    -Wold-style-cast
 ifeq ($(OSPRETTY), macOS)
     CXXFLAGS += -mmacosx-version-min=$(MINMACOSVER) -Wunguarded-availability
 endif
@@ -58,7 +59,12 @@ print-% : ; @echo "$* = $($*)"
 all: $(EXE)
 
 install: paz-archive
-	cmp -s paz-archive $(BINPATH)/paz-archive || cp paz-archive $(BINPATH)/
+	@[[ -d $(BINPATH) ]] || \
+	    { echo "mkdir -p $(BINPATH)"; mkdir -p $(BINPATH); }
+	@cmp -s paz-archive $(BINPATH)/paz-archive && \
+	    echo "Nothing to do for $(BINPATH)/paz-archive" || \
+	    { echo "cp paz-archive $(BINPATH)/"; \
+	    cp paz-archive $(BINPATH)/; }
 
 ifeq ($(OSPRETTY), macOS)
 %: %.cpp
