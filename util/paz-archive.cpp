@@ -8,18 +8,29 @@
 
 static const std::string HelpMsg = 1 + R"===(
 Usage:
-    paz-archive [options] <files> <output path>
+    paz-archive [options] <file1> [file2] ... <output path>
     paz-archive [options] <directory> [output path = <directory>.pazarchive]
 
 Options:
     -c, --convert: Convert each OBJ object into a PAZ model
+    -h, --help:    Print this message and exit
 )===";
 
 int main(int argc, char** argv)
 {
+    if(argc == 2)
+    {
+        const std::string arg1 = argv[1];
+        if(arg1 == "-h" || arg1 == "--help")
+        {
+            std::cout << std::endl << HelpMsg << std::endl;
+            return 0;
+        }
+    }
+
     if(argc < 2)
     {
-        std::cout << std::endl << HelpMsg << std::endl;
+        std::cerr << std::endl << HelpMsg << std::endl;
         return 1;
     }
 
@@ -81,7 +92,7 @@ int main(int argc, char** argv)
     }
     else
     {
-        std::cout << std::endl << HelpMsg << std::endl;
+        std::cerr << std::endl << HelpMsg << std::endl;
         return 1;
     }
 
