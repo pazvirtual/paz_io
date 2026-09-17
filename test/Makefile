@@ -57,8 +57,10 @@ all: $(EXE)
 
 ifeq ($(OSPRETTY), macOS)
 %: %.cpp
-	$(CXX) -arch arm64 -o $@_arm64 $< $(CXXFLAGS) $(INCL) $(LDFLAGS) $(LDLIBS)
-	$(CXX) -arch x86_64 -o $@_x86_64 $< $(CXXFLAGS) $(INCL) $(LDFLAGS) $(LDLIBS)
+	$(CXX) -arch arm64 -o $@_arm64 $< $(CXXFLAGS) $(INCL) $(LDFLAGS) \
+	    $(LDLIBS)
+	$(CXX) -arch x86_64 -o $@_x86_64 $< $(CXXFLAGS) $(INCL) $(LDFLAGS) \
+	    $(LDLIBS)
 	lipo -create -output $@ $@_arm64 $@_x86_64
 endif
 
