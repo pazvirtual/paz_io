@@ -54,7 +54,7 @@ EXE := $(SRC:.cpp=)
 
 print-% : ; @echo "$* = $($*)"
 
-.PHONY: $(SRC)
+.SUFFIXES:
 
 all: $(EXE)
 
@@ -67,12 +67,13 @@ install: paz-archive
 	    cp paz-archive $(BINPATH)/; }
 
 ifeq ($(OSPRETTY), macOS)
-%: %.cpp
-	$(CXX) -arch arm64 -o $@_arm64 $< $(CXXFLAGS) $(INCL) $(LDFLAGS) \
-	    $(LDLIBS)
-	$(CXX) -arch x86_64 -o $@_x86_64 $< $(CXXFLAGS) $(INCL) $(LDFLAGS) \
-	    $(LDLIBS)
+%: %.cpp ../libpazio.a
+	$(CXX) -arch arm64 -o $@_arm64 $< $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
+	$(CXX) -arch x86_64 -o $@_x86_64 $< $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
 	lipo -create -output $@ $@_arm64 $@_x86_64
+else
+%: %.cpp ../libpazio.a
+	$(CXX) -o $@ $< $(CXXFLAGS) $(LDFLAGS) $(LDLIBS)
 endif
 
 ifeq ($(OSPRETTY), macOS)
