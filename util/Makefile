@@ -59,7 +59,7 @@ print-% : ; @echo "$* = $($*)"
 all: $(EXE)
 
 install: paz-archive
-	@[[ -d $(BINPATH) ]] || \
+	@[ -d $(BINPATH) ] || \
 	    { echo "mkdir -p $(BINPATH)"; mkdir -p $(BINPATH); }
 	@cmp -s paz-archive $(BINPATH)/paz-archive && \
 	    echo "Nothing to do for $(BINPATH)/paz-archive" || \
